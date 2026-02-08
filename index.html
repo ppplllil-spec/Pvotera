@@ -187,65 +187,49 @@
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxslAlrO72Vezr9On1me1nT_NphwXfbnJJiWPNV34aXVMOCaJc9Wr6aq52FGWN2EBIHMg/exec;
-const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
-let allData = []; // 전체 데이터를 저장할 변수
+// 새로 발급받은 URL 적용
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxslAlrO72Vezr9On1me1nT_NphwXfbnJJiWPNV34aXVMOCaJc9Wr6aq52FGWN2EBIHMg/exec";
+let allData = []; 
 
-// 1. 링크 제출 함수
-async function submitLink() {
-    const input = document.getElementById('linkInput');
-    const url = input.value;
-    const btn = document.querySelector('.add-btn');
+// 1. 페이지 로드 시 실행
+window.onload = fetchData;
 
-    if(!url) return alert("링크를 입력해주세요!");
-    btn.innerText = "분석중..";
-    btn.disabled = true;
-
-    try {
-        await fetch(GAS_URL, {
-            method: 'POST',
-            mode: 'no-cors', // CORS 정책 대응
-            body: JSON.stringify({ url: url })
-        });
-        alert("성공적으로 분석되어 시트에 저장되었습니다! (반영까지 1~2분이 걸릴 수 있습니다)");
-        setTimeout(fetchData, 1500); // 저장 후 잠시 뒤 데이터 갱신
-    } catch (e) {
-        alert("저장 요청을 보냈습니다. 시트를 확인해 주세요.");
-    } finally {
-        btn.innerText = "추가";
-        btn.disabled = false;
-        input.value = "";
-    }
-}
-
-// 2. 데이터 불러오기 및 화면 그리기
+// 2. 시트 데이터 불러오기 함수
 async function fetchData() {
     const grid = document.getElementById('mainGrid');
-    grid.innerHTML = "<p>데이터를 불러오는 중...</p>";
+    grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>데이터를 불러오는 중... ✨</p>";
 
     try {
-        // gviz 대신 GAS URL에서 직접 JSON 데이터를 가져옵니다.
         const response = await fetch(GAS_URL);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
+        if (!response.ok) throw new Error('데이터 로드 실패');
         
-        allData = data.reverse(); // 최신순 정렬
+        allData = await response.json(); // GAS의 doGet에서 보낸 JSON 수신
+        
+        // 최신순으로 정렬 (시트 아래쪽 데이터가 위로 오게)
+        allData.reverse(); 
+        
         renderCards(allData);
     } catch (e) {
         console.error("Fetch Error:", e);
-        grid.innerHTML = "<p>데이터 로드 실패. GAS URL 또는 시트 공유 설정을 확인해주세요.</p>";
+        grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>데이터를 불러오지 못했습니다. <br>시트 공유 설정이나 GAS 배포 상태를 확인해주세요.</p>";
     }
 }
 
+// 3. 카드 렌더링 함수 (PLAVEPLLI 디자인 v2.6)
 function renderCards(dataList) {
     const grid = document.getElementById('mainGrid');
     grid.innerHTML = "";
+
+    if (dataList.length === 0) {
+        grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>표시할 정보가 없습니다. ☺️</p>";
+        return;
+    }
 
     dataList.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card';
         
-        // 상태에 따른 버튼 처리
+        // 상태별 버튼 속성 설정
         let btnAttr = `href="${item.url}" target="_blank"`;
         let btnText = "바로가기";
         let btnClass = "go-link";
@@ -254,29 +238,59 @@ function renderCards(dataList) {
             btnText = "🗓️ 투표 예정";
             btnClass += " status-upcoming";
             btnAttr = "onclick='alert(\"아직 투표 기간이 아닙니다!\")'";
-        } else if (!item.url || item.url === "undefined" || item.url.includes("링크없음")) {
+        } else if (!item.url || item.url === "" || item.url === "링크없음") {
             btnText = "🔍 앱 내 확인";
             btnClass += " status-nolink";
             btnAttr = "onclick='alert(\"이 투표는 해당 앱 내부에서 직접 진행해 주세요.\")'";
         }
 
         card.innerHTML = `
-            <span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>
-            <div class="card-title">${item.title}</div>
+            <span class="tag tag-${item.tag ? item.tag.toLowerCase() : 'info'}">${item.tag || 'INFO'}</span>
+            <div class="card-title">${item.title || '공유된 정보'}</div>
             <a ${btnAttr} class="${btnClass}">${btnText}</a>
         `;
         grid.appendChild(card);
     });
 }
+
+// 4. 링크 제출 함수
+async function submitLink() {
+    const input = document.getElementById('linkInput');
+    const url = input.value;
+    const btn = document.querySelector('.add-btn');
+
+    if(!url) return alert("링크를 입력해주세요!");
     
-// 4. 탭 필터링 이벤트 추가
+    btn.innerText = "분석중..";
+    btn.disabled = true;
+
+    try {
+        // mode: 'no-cors'는 응답 내용을 읽을 수 없으므로, fetch 성공 여부만 확인하거나 
+        // GAS에서 CORS를 허용하도록 처리된 경우 그대로 사용합니다.
+        await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ url: url })
+        });
+        
+        alert("성공적으로 분석되어 시트에 저장되었습니다!");
+        fetchData(); // 데이터 새로고침
+    } catch (e) {
+        console.error("Post Error:", e);
+        alert("등록 요청을 보냈습니다. 반영까지 시간이 걸릴 수 있습니다.");
+    } finally {
+        btn.innerText = "추가";
+        btn.disabled = false;
+        input.value = "";
+    }
+}
+
+// 5. 탭 필터링 이벤트 (PLAVEPLLI 디자인)
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', function() {
-        // 활성 탭 디자인 변경
         document.querySelector('.tab.active').classList.remove('active');
         this.classList.add('active');
 
-        const categoryName = this.innerText.replace(/[^가-힣a-zA-Z]/g, "").trim(); // 이모지 제거 후 텍스트만 추출
+        const categoryName = this.innerText.replace(/[^가-힣a-zA-Z]/g, "").trim();
         
         if (categoryName === "전체") {
             renderCards(allData);
