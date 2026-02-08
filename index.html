@@ -162,27 +162,28 @@
 <script>
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOqz60xfz0jNomAlfc3E_eTAM93-7paIZIeYKcRcpGkvAXItgFA54bmxkAIs3vHlMdNg/exec";
 const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
+let allData = []; // 전체 데이터를 저장할 변수
 
-// 1. 링크 제출 함수 (PLAVEPLLI 분석 시스템 호출)
+// 1. 링크 제출 함수
 async function submitLink() {
     const input = document.getElementById('linkInput');
     const url = input.value;
     const btn = document.querySelector('.add-btn');
 
     if(!url) return alert("링크를 입력해주세요!");
-
     btn.innerText = "분석중..";
     btn.disabled = true;
 
     try {
         await fetch(GAS_URL, {
             method: 'POST',
+            mode: 'no-cors', // CORS 정책 대응
             body: JSON.stringify({ url: url })
         });
-        alert("성공적으로 분석되어 시트에 저장되었습니다!");
-        fetchData(); // 화면 새로고침 대신 데이터를 다시 불러옴
+        alert("성공적으로 분석되어 시트에 저장되었습니다! (반영까지 1~2분이 걸릴 수 있습니다)");
+        setTimeout(fetchData, 1500); // 저장 후 잠시 뒤 데이터 갱신
     } catch (e) {
-        alert("저장 실패. 다시 시도해주세요.");
+        alert("저장 요청을 보냈습니다. 시트를 확인해 주세요.");
     } finally {
         btn.innerText = "추가";
         btn.disabled = false;
@@ -190,42 +191,69 @@ async function submitLink() {
     }
 }
 
-// 2. 시트 데이터 불러오기 함수
+// 2. 데이터 불러오기 및 화면 그리기
 async function fetchData() {
     const grid = document.getElementById('mainGrid');
     grid.innerHTML = "<p>데이터를 불러오는 중...</p>";
 
     try {
-        // GAS를 통해 데이터를 가져오거나, 시트 API를 사용 (여기서는 단순화를 위해 GAS 확장 권장)
-        // 만약 시트 API 키가 있다면 방법B를 쓰고, 없다면 GAS로 데이터를 가져오는 doGet을 추가해야 합니다.
-        // 일단은 '방법B' 형태의 fetch 예시입니다.
         const response = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`);
         const text = await response.text();
         const data = JSON.parse(text.substr(47).slice(0, -2));
-        const rows = data.table.rows;
+        
+        // 데이터 매핑 (안전하게 값 추출)
+        allData = data.table.rows.map(row => ({
+            url: row.c[1] ? row.c[1].v : '',
+            category: row.c[2] ? row.c[2].v : '정보/광고',
+            tag: row.c[3] ? row.c[3].v : 'INFO'
+        })).reverse(); // 최신순
 
-        grid.innerHTML = ""; // 로딩 문구 제거
-
-        rows.reverse().forEach(row => { // 최신순으로 정렬
-            const url = row.c[1].v;
-            const category = row.c[2].v;
-            const tag = row.c[3].v;
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <span class="tag tag-${tag.toLowerCase()}">${tag}</span>
-                <div class="card-title">${url}</div>
-                <a href="${url}" target="_blank" class="go-link">바로가기</a>
-            `;
-            grid.appendChild(card);
-        });
+        renderCards(allData);
     } catch (e) {
-        grid.innerHTML = "<p>데이터를 불러오는데 실패했습니다. 시트 공유 설정을 확인해주세요.</p>";
+        grid.innerHTML = "<p>데이터 로드 실패. 시트 공유 설정을 확인해 주세요.</p>";
     }
 }
 
-// 페이지 로드 시 데이터 호출
+// 3. 카드 렌더링 함수
+function renderCards(dataList) {
+    const grid = document.getElementById('mainGrid');
+    grid.innerHTML = "";
+
+    if (dataList.length === 0) {
+        grid.innerHTML = "<p>표시할 데이터가 없습니다.</p>";
+        return;
+    }
+
+    dataList.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>
+            <div class="card-title">${item.url}</div>
+            <a href="${item.url}" target="_blank" class="go-link">바로가기</a>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// 4. 탭 필터링 이벤트 추가
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // 활성 탭 디자인 변경
+        document.querySelector('.tab.active').classList.remove('active');
+        this.classList.add('active');
+
+        const categoryName = this.innerText.replace(/[^가-힣a-zA-Z]/g, "").trim(); // 이모지 제거 후 텍스트만 추출
+        
+        if (categoryName === "전체") {
+            renderCards(allData);
+        } else {
+            const filtered = allData.filter(item => item.category === categoryName);
+            renderCards(filtered);
+        }
+    });
+});
+
 window.onload = fetchData;
 </script>
 
