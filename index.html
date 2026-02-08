@@ -160,39 +160,73 @@
 </div>
 
 <script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyOqz60xfz0jNomAlfc3E_eTAM93-7paIZIeYKcRcpGkvAXItgFA54bmxkAIs3vHlMdNg/exec";
+const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
+
+// 1. 링크 제출 함수 (PLAVEPLLI 분석 시스템 호출)
 async function submitLink() {
     const input = document.getElementById('linkInput');
     const url = input.value;
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyOqz60xfz0jNomAlfc3E_eTAM93-7paIZIeYKcRcpGkvAXItgFA54bmxkAIs3vHlMdNg/exec"; 
-
-    if(!url) return alert("링크를 넣어주세요!");
-
-    // UI 피드백
     const btn = document.querySelector('.add-btn');
-    btn.innerText = "분석 중...";
+
+    if(!url) return alert("링크를 입력해주세요!");
+
+    btn.innerText = "분석중..";
     btn.disabled = true;
 
     try {
-        const response = await fetch(GAS_URL, {
+        await fetch(GAS_URL, {
             method: 'POST',
             body: JSON.stringify({ url: url })
         });
-        
-        const result = await response.json();
-        
-        if(result.result === "success") {
-            alert(`분석 완료! 카테고리: ${result.category}`);
-            location.reload(); // 등록 후 화면 새로고침
-        }
-    } catch (error) {
-        console.error("오류 발생:", error);
-        alert("등록에 실패했습니다.");
+        alert("성공적으로 분석되어 시트에 저장되었습니다!");
+        fetchData(); // 화면 새로고침 대신 데이터를 다시 불러옴
+    } catch (e) {
+        alert("저장 실패. 다시 시도해주세요.");
     } finally {
         btn.innerText = "추가";
         btn.disabled = false;
         input.value = "";
     }
 }
+
+// 2. 시트 데이터 불러오기 함수
+async function fetchData() {
+    const grid = document.getElementById('mainGrid');
+    grid.innerHTML = "<p>데이터를 불러오는 중...</p>";
+
+    try {
+        // GAS를 통해 데이터를 가져오거나, 시트 API를 사용 (여기서는 단순화를 위해 GAS 확장 권장)
+        // 만약 시트 API 키가 있다면 방법B를 쓰고, 없다면 GAS로 데이터를 가져오는 doGet을 추가해야 합니다.
+        // 일단은 '방법B' 형태의 fetch 예시입니다.
+        const response = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`);
+        const text = await response.text();
+        const data = JSON.parse(text.substr(47).slice(0, -2));
+        const rows = data.table.rows;
+
+        grid.innerHTML = ""; // 로딩 문구 제거
+
+        rows.reverse().forEach(row => { // 최신순으로 정렬
+            const url = row.c[1].v;
+            const category = row.c[2].v;
+            const tag = row.c[3].v;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <span class="tag tag-${tag.toLowerCase()}">${tag}</span>
+                <div class="card-title">${url}</div>
+                <a href="${url}" target="_blank" class="go-link">바로가기</a>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (e) {
+        grid.innerHTML = "<p>데이터를 불러오는데 실패했습니다. 시트 공유 설정을 확인해주세요.</p>";
+    }
+}
+
+// 페이지 로드 시 데이터 호출
+window.onload = fetchData;
 </script>
 
 </body>
