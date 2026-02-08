@@ -3,305 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> PLAVEPLLI</title>
+    <title>Kyul - Dreamy Edition v5</title>
     <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
         :root {
-            --bg: #fdfaf6;
-            --card-white: #ffffff;
-            --pink: #ffdee9;
-            --blue: #e1f1ff;
-            --purple: #efe9ff;
-            --text: #5a5a5a;
-            --point: #ff91af;
+            --bg-top: #c5c9f4;
+            --bg-bottom: #fbc2eb;
+            --glass-white: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-color: #4b4b7c;
+            --accent-pink: #ff85a1;
+            --accent-blue: #7d93eb;
         }
 
         body {
-            margin: 0; padding: 0;
-            background-color: var(--bg);
-            color: var(--text);
             font-family: 'Pretendard', sans-serif;
+            background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            background-attachment: fixed;
+            margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
         }
 
-        /* 헤더 & 로고 */
-        header {
-            padding: 30px 20px;
-            text-align: center;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--point);
-            letter-spacing: 2px;
+        body::before {
+            content: "♥"; position: fixed; top: 15%; right: 10%;
+            font-size: 150px; color: rgba(255, 255, 255, 0.2);
+            filter: blur(5px); z-index: -1;
         }
 
-        /* 링크 입력 UI (PLAVEPLLI 스타일) */
-        .input-container {
-            padding: 0 20px;
-            margin-bottom: 20px;
-        }
-        .input-box {
-            background: var(--card-white);
-            padding: 10px;
-            border-radius: 15px;
-            display: flex;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-        input {
-            flex: 1; border: none; outline: none;
-            padding: 10px; font-size: 14px;
-        }
-        .add-btn {
-            background: var(--pink);
-            border: none; padding: 10px 15px;
-            border-radius: 10px; color: var(--text);
-            font-weight: bold; cursor: pointer;
+        .container { width: 100%; max-width: 480px; }
+        header { text-align: center; padding: 30px 0; }
+        .logo { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); letter-spacing: -1px; }
+
+        .glass-input-panel {
+            background: var(--glass-white);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
 
-        /* 탭 메뉴 */
-        .tab-bar {
-            display: flex; overflow-x: auto;
-            gap: 10px; padding: 0 20px 20px;
-            scrollbar-width: none;
-        }
-        .tab {
-            white-space: nowrap;
-            padding: 8px 18px;
-            border-radius: 20px;
-            background: var(--card-white);
-            font-size: 13px;
-            border: 1px solid #eee;
-            cursor: pointer;
-        }
-        .tab.active {
-            background: var(--point);
-            color: white; border: none;
+        .input-row input {
+            width: 100%; border: none; background: rgba(255,255,255,0.3);
+            border-radius: 15px; padding: 15px; margin-bottom: 12px;
+            font-size: 14px; outline: none; color: var(--text-color);
+            box-sizing: border-box;
         }
 
-        /* 2열 카드 그리드 (PLAVEPLLI 핵심) */
-        .card-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 0 20px 40px;
+        .cat-group { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        .chip {
+            padding: 8px 18px; border-radius: 20px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.2); color: var(--text-color);
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
         }
-.card {
-    background: var(--card-white);
-    border-radius: 20px;
-    padding: 18px;
-    box-shadow: 0 10px 20px rgba(255, 145, 175, 0.05); /* 은은한 핑크 그림자 */
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 145, 175, 0.12);
-}
+        .chip.active { background: white; color: var(--accent-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-.tag {
-    font-size: 10px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    color: #fff; /* 파스텔 배경엔 흰색 글씨도 예뻐요 */
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
+        .submit-btn {
+            width: 100%; padding: 16px; border-radius: 20px; border: none;
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: white; font-weight: 800; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
-.tag-vote { background: linear-gradient(135deg, #ffdee9 0%, #ffb7ca 100%); color: #d64e71; }
-.tag-radio { background: linear-gradient(135deg, #e1f1ff 0%, #b2d8ff 100%); color: #4e86d6; }
-.tag-info { background: linear-gradient(135deg, #efe9ff 0%, #d1c4ff 100%); color: #735ed6; }
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(10px);
+            border-radius: 25px; padding: 18px;
+            border: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 140px; transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.6); }
 
-.card-title {
-    font-size: 15px;
-    margin: 12px 0;
-    color: #444;
-    word-break: break-all;
-}
+        .tag { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 10px; width: fit-content; margin-bottom: 10px; color: white; }
+        .tag-vote { background: var(--accent-pink); }
+        .tag-info { background: var(--accent-blue); }
+        .tag-upcoming { background: #b2bec3; }
 
-.go-link {
-    background: #fdfaf6;
-    border: 1.5px solid var(--pink);
-    color: var(--point);
-    font-weight: bold;
-    transition: 0.2s;
-}
+        .card-title { font-size: 14px; font-weight: 700; line-height: 1.4; color: var(--text-color); margin-bottom: 10px; }
+        .status-text { font-size: 11px; font-weight: 600; margin-bottom: 10px; }
 
-.go-link:hover {
-    background: var(--pink);
-    color: white;
-}
-
-/* 추가 로딩 애니메이션 */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.card { animation: fadeIn 0.5s ease forwards; }
-    
-        /* 상태별 버튼 스타일 */
-.go-link.status-upcoming {
-    border-color: #eee;
-    color: #999;
-    cursor: default;
-}
-.go-link.status-nolink {
-    border-color: var(--purple);
-    color: var(--text);
-    background: var(--purple);
-    opacity: 0.7;
-}
+        .go-btn {
+            text-align: center; text-decoration: none; padding: 8px;
+            background: rgba(255,255,255,0.5); border-radius: 12px;
+            font-size: 12px; font-weight: 800; color: var(--text-color);
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">plaveplli투표광고라디오정보공유</div>
-</header>
+<div class="container">
+    <header>
+        <div class="logo">plaveplli 정보공유</div>
+    </header>
 
-<div class="input-container">
-    <div class="input-box">
-        <input type="text" id="linkInput" placeholder="분석할 링크를 입력하세요...">
-        <button class="add-btn" onclick="submitLink()">추가</button>
+    <div class="glass-input-panel">
+        <div class="input-row">
+            <input type="text" id="linkInput" placeholder="🔗 공유할 링크를 넣어주세요">
+            <input type="text" id="titleInput" placeholder="📝 제목/상세 내용을 적어주세요">
+        </div>
+
+        <div id="voteAppArea" style="display:none; margin-bottom:15px;">
+            <label style="font-size:12px; color:white; font-weight:bold; margin-bottom:5px; display:block;">🗳️ 투표 앱 선택</label>
+            <select id="voteAppSelect" onchange="applyAppTitle()" style="width:100%; border:none; padding:12px; border-radius:15px; background:rgba(255,255,255,0.6); color:var(--text-color); font-family: inherit;">
+                <option value="">-- 투표 앱을 선택하세요 --</option>
+                <option value="주간인기상">주간인기상</option>
+                <option value="최애돌">최애돌</option>
+                <option value="하이어">하이어</option>
+                <option value="딩고">딩고</option>
+                <option value="스타트렌드">스타트렌드</option>
+                <option value="링크/tin">링크/tin</option>
+                <option value="마이원픽">마이원픽</option>
+                <option value="뮤니버스">뮤니버스</option>
+                <option value="뮤빗">뮤빗</option>
+                <option value="벅스">벅스</option>
+                <option value="후즈팬">후즈팬</option>
+                <option value="팬앤스타">팬앤스타</option>
+                <option value="팬캐스트">팬캐스트</option>
+                <option value="팬플러스">팬플러스</option>
+                <option value="포도알">포도알</option>
+                <option value="피크닠">피크닠</option>
+                <option value="아이도키">아이도키</option>
+                <option value="아이돌챔프">아이돌챔프</option>
+                <option value="아이돌픽">아이돌픽</option>
+                <option value="유센">유센</option>
+                <option value="유픽">유픽</option>
+                <option value="셀럽챔프">셀럽챔프</option>
+                <option value="스타덤">스타덤</option>
+            </select>
+        </div>
+
+        <div class="cat-group">
+            <button class="chip active" onclick="setCat(this, 'INFO', '정보/광고')">📢 정보</button>
+            <button class="chip" onclick="setCat(this, 'VOTE', '투표')">🗳️ 투표</button>
+            <button class="chip" onclick="setCat(this, 'RADIO', '라디오')">📻 라디오</button>
+        </div>
+
+        <div id="timeArea" style="display:none; margin-bottom:15px;">
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label style="font-size:11px; color:white; font-weight:bold; margin-bottom:5px; display:block;">📅 시작 일시</label>
+                    <input type="datetime-local" id="startInput" style="width:100%; border:none; padding:10px; border-radius:12px; background:rgba(255,255,255,0.4); color:var(--text-color); font-size: 12px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size:11px; color:white; font-weight:bold; margin-bottom:5px; display:block;">⏰ 마감 일시</label>
+                    <input type="datetime-local" id="deadlineInput" style="width:100%; border:none; padding:10px; border-radius:12px; background:rgba(255,255,255,0.4); color:var(--text-color); font-size: 12px;">
+                </div>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="submitLink()">등록하기</button>
     </div>
-</div>
 
-<div class="tab-bar">
-    <div class="tab active">전체</div>
-    <div class="tab">🗳️ 투표</div>
-    <div class="tab">📻 라디오</div>
-    <div class="tab">📢 정보/광고</div>
-</div>
-
-<div class="card-grid" id="mainGrid">
-    <div class="card">
-        <span class="tag tag-vote">VOTE</span>
-        <div class="card-title">아이돌 챔프 2월 월간 랭킹</div>
-        <a href="#" class="go-link">투표하러 가기</a>
-    </div>
-    <div class="card">
-        <span class="tag tag-radio">RADIO</span>
-        <div class="card-title">밤의 라디오: 보이는 라디오</div>
-        <a href="#" class="go-link">채널 바로가기</a>
+    <div class="card-grid" id="mainGrid">
+        <div style="grid-column: 1/3; text-align: center; color: white;">데이터를 불러오는 중...</div>
     </div>
 </div>
 
 <script>
-// 새로 발급받은 URL 적용
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxslAlrO72Vezr9On1me1nT_NphwXfbnJJiWPNV34aXVMOCaJc9Wr6aq52FGWN2EBIHMg/exec";
-let allData = []; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxslAlrO72Vezr9On1me1nT_NphwXfbnJJiWPNV34aXVMOCaJc9Wr6aq52FGWN2EBIHMg/exec";
+    const API_KEY = "여기에_구글_API_키를_넣으세요";
+    const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
 
-// 1. 페이지 로드 시 실행
-window.onload = fetchData;
+    let selectedTag = 'INFO';
+    let selectedName = '정보/광고';
 
-// 2. 시트 데이터 불러오기 함수
-async function fetchData() {
-    const grid = document.getElementById('mainGrid');
-    grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>데이터를 불러오는 중... ✨</p>";
-
-    try {
-        const response = await fetch(GAS_URL);
-        if (!response.ok) throw new Error('데이터 로드 실패');
-        
-        allData = await response.json(); // GAS의 doGet에서 보낸 JSON 수신
-        
-        // 최신순으로 정렬 (시트 아래쪽 데이터가 위로 오게)
-        allData.reverse(); 
-        
-        renderCards(allData);
-    } catch (e) {
-        console.error("Fetch Error:", e);
-        grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>데이터를 불러오지 못했습니다. <br>시트 공유 설정이나 GAS 배포 상태를 확인해주세요.</p>";
-    }
-}
-
-// 3. 카드 렌더링 함수 (PLAVEPLLI 디자인 v2.6)
-function renderCards(dataList) {
-    const grid = document.getElementById('mainGrid');
-    grid.innerHTML = "";
-
-    if (dataList.length === 0) {
-        grid.innerHTML = "<p style='text-align:center; grid-column: 1/3; padding: 20px;'>표시할 정보가 없습니다. ☺️</p>";
-        return;
+    function setCat(btn, tag, name) {
+        document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTag = tag;
+        selectedName = name;
+        const isVote = (tag === 'VOTE');
+        document.getElementById('voteAppArea').style.display = isVote ? 'block' : 'none';
+        document.getElementById('timeArea').style.display = isVote ? 'block' : 'none';
     }
 
-    dataList.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        
-        // 상태별 버튼 속성 설정
-        let btnAttr = `href="${item.url}" target="_blank"`;
-        let btnText = "바로가기";
-        let btnClass = "go-link";
+    function applyAppTitle() {
+        const select = document.getElementById('voteAppSelect');
+        const titleInput = document.getElementById('titleInput');
+        if(select.value) {
+            titleInput.value = `[${select.value}] 투표 부탁드려요!`;
+        }
+    }
 
-        if (item.status === "투표예정") {
-            btnText = "🗓️ 투표 예정";
-            btnClass += " status-upcoming";
-            btnAttr = "onclick='alert(\"아직 투표 기간이 아닙니다!\")'";
-        } else if (!item.url || item.url === "" || item.url === "링크없음") {
-            btnText = "🔍 앱 내 확인";
-            btnClass += " status-nolink";
-            btnAttr = "onclick='alert(\"이 투표는 해당 앱 내부에서 직접 진행해 주세요.\")'";
+    async function submitLink() {
+        const urlInput = document.getElementById('linkInput');
+        const titleInput = document.getElementById('titleInput');
+        const startInput = document.getElementById('startInput');
+        const deadlineInput = document.getElementById('deadlineInput');
+
+        if(!urlInput.value) return alert("공유할 링크를 입력해 주세요! ✨");
+
+        const btn = document.querySelector('.submit-btn');
+        btn.innerText = "🚀 등록 중...";
+        btn.disabled = true;
+
+        try {
+            await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    url: urlInput.value,
+                    userTitle: titleInput.value,
+                    category: selectedName,
+                    tag: selectedTag,
+                    startTime: startInput.value,
+                    deadline: deadlineInput.value 
+                })
+            });
+            alert("성공적으로 등록되었습니다! 💖");
+            location.reload();
+        } catch (e) {
+            alert("등록 실패! 주소나 권한 설정을 확인해 주세요.");
+            btn.innerText = "등록하기";
+            btn.disabled = false;
+        }
+    }
+
+    async function fetchCards() {
+        const RANGE = '시트1!A2:G'; // 시작 시간 포함 G열까지 읽기
+        const fetchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+        try {
+            const response = await fetch(fetchUrl);
+            const data = await response.json();
+            renderCards(data.values);
+        } catch (error) {
+            console.error("데이터 로딩 오류:", error);
+        }
+    }
+
+    function renderCards(rows) {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = ''; 
+        const now = new Date();
+
+        if (!rows || rows.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">등록된 정보가 없습니다.</div>';
+            return;
         }
 
-        card.innerHTML = `
-            <span class="tag tag-${item.tag ? item.tag.toLowerCase() : 'info'}">${item.tag || 'INFO'}</span>
-            <div class="card-title">${item.title || '공유된 정보'}</div>
-            <a ${btnAttr} class="${btnClass}">${btnText}</a>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-// 4. 링크 제출 함수
-async function submitLink() {
-    const input = document.getElementById('linkInput');
-    const url = input.value;
-    const btn = document.querySelector('.add-btn');
-
-    if(!url) return alert("링크를 입력해주세요!");
-    
-    btn.innerText = "분석중..";
-    btn.disabled = true;
-
-    try {
-        // mode: 'no-cors'는 응답 내용을 읽을 수 없으므로, fetch 성공 여부만 확인하거나 
-        // GAS에서 CORS를 허용하도록 처리된 경우 그대로 사용합니다.
-        await fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify({ url: url })
+        // 유효한 데이터 필터링 (링크 필수 + 마감 기한 체크)
+        const validRows = rows.filter(row => {
+            if (!row || !row[1]) return false;
+            const deadline = row[6]; // G열: 마감기한 (인덱스 6)
+            if (deadline) {
+                const expireDate = new Date(deadline);
+                if (expireDate < now) return false;
+            }
+            return true;
         });
-        
-        alert("성공적으로 분석되어 시트에 저장되었습니다!");
-        fetchData(); // 데이터 새로고침
-    } catch (e) {
-        console.error("Post Error:", e);
-        alert("등록 요청을 보냈습니다. 반영까지 시간이 걸릴 수 있습니다.");
-    } finally {
-        btn.innerText = "추가";
-        btn.disabled = false;
-        input.value = "";
-    }
-}
 
-// 5. 탭 필터링 이벤트 (PLAVEPLLI 디자인)
-document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        document.querySelector('.tab.active').classList.remove('active');
-        this.classList.add('active');
-
-        const categoryName = this.innerText.replace(/[^가-힣a-zA-Z]/g, "").trim();
-        
-        if (categoryName === "전체") {
-            renderCards(allData);
-        } else {
-            const filtered = allData.filter(item => item.category === categoryName);
-            renderCards(filtered);
+        if (validRows.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">현재 활성화된 정보가 없습니다. ✨</div>';
+            return;
         }
-    });
-});
 
-window.onload = fetchData;
+        validRows.reverse().forEach(row => {
+            const [date, link, category, tag, title, startTime, deadline] = row;
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const start = startTime ? new Date(startTime) : null;
+            const end = deadline ? new Date(deadline) : null;
+            
+            let isUpcoming = start && start > now;
+            let tagClass = isUpcoming ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info');
+            
+            let statusHtml = '';
+            if (isUpcoming) {
+                statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${start.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
+                card.style.opacity = "0.8";
+            } else if (end && tag === 'VOTE') {
+                const diff = end - now;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                let text = d > 0 ? `D-${d}` : (h > 0 ? `임박 (${h}시간)` : "곧 마감!");
+                statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${text}</div>`;
+            }
+
+            card.innerHTML = `
+                <div>
+                    <span class="tag ${tagClass}">${isUpcoming ? 'UPCOMING' : (tag || 'INFO')}</span>
+                    <div class="card-title">${title || '공유된 정보'}</div>
+                    ${statusHtml}
+                </div>
+                <a href="${link}" target="_blank" class="go-btn">${isUpcoming ? '미리보기' : '바로가기'}</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    window.onload = fetchCards;
 </script>
 
 </body>
