@@ -201,41 +201,34 @@ async function fetchData() {
         const text = await response.text();
         const data = JSON.parse(text.substr(47).slice(0, -2));
         
-        // 데이터 매핑 (안전하게 값 추출)
         allData = data.table.rows.map(row => ({
             url: row.c[1] ? row.c[1].v : '',
             category: row.c[2] ? row.c[2].v : '정보/광고',
-            tag: row.c[3] ? row.c[3].v : 'INFO'
-        })).reverse(); // 최신순
+            tag: row.c[3] ? row.c[3].v : 'INFO',
+            title: row.c[4] ? row.c[4].v : '제목 없음' // E열(인덱스 4) 제목 가져오기
+        })).reverse();
 
         renderCards(allData);
     } catch (e) {
-        grid.innerHTML = "<p>데이터 로드 실패. 시트 공유 설정을 확인해 주세요.</p>";
+        grid.innerHTML = "<p>데이터 로드 실패.</p>";
     }
 }
 
-// 3. 카드 렌더링 함수
 function renderCards(dataList) {
     const grid = document.getElementById('mainGrid');
     grid.innerHTML = "";
-
-    if (dataList.length === 0) {
-        grid.innerHTML = "<p>표시할 데이터가 없습니다.</p>";
-        return;
-    }
 
     dataList.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
             <span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>
-            <div class="card-title">${item.url}</div>
-            <a href="${item.url}" target="_blank" class="go-link">바로가기</a>
+            <div class="card-title">${item.title}</div> <a href="${item.url}" target="_blank" class="go-link">바로가기</a>
         `;
         grid.appendChild(card);
     });
 }
-
+    
 // 4. 탭 필터링 이벤트 추가
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', function() {
