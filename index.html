@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결 (Kyul) - PLAVEPLLI Design</title>
+    <style>
+        :root {
+            --bg: #fdfaf6;
+            --card-white: #ffffff;
+            --pink: #ffdee9;
+            --blue: #e1f1ff;
+            --purple: #efe9ff;
+            --text: #5a5a5a;
+            --point: #ff91af;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        /* 헤더 & 로고 */
+        header {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--point);
+            letter-spacing: 2px;
+        }
+
+        /* 링크 입력 UI (PLAVEPLLI 스타일) */
+        .input-container {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+        .input-box {
+            background: var(--card-white);
+            padding: 10px;
+            border-radius: 15px;
+            display: flex;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        input {
+            flex: 1; border: none; outline: none;
+            padding: 10px; font-size: 14px;
+        }
+        .add-btn {
+            background: var(--pink);
+            border: none; padding: 10px 15px;
+            border-radius: 10px; color: var(--text);
+            font-weight: bold; cursor: pointer;
+        }
+
+        /* 탭 메뉴 */
+        .tab-bar {
+            display: flex; overflow-x: auto;
+            gap: 10px; padding: 0 20px 20px;
+            scrollbar-width: none;
+        }
+        .tab {
+            white-space: nowrap;
+            padding: 8px 18px;
+            border-radius: 20px;
+            background: var(--card-white);
+            font-size: 13px;
+            border: 1px solid #eee;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: var(--point);
+            color: white; border: none;
+        }
+
+        /* 2열 카드 그리드 (PLAVEPLLI 핵심) */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px 40px;
+        }
+        .card {
+            background: var(--card-white);
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            transition: 0.3s;
+        }
+        .tag {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .tag-vote { background: var(--pink); }
+        .tag-radio { background: var(--blue); }
+        .tag-info { background: var(--purple); }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .go-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">결 (Kyul)</div>
+</header>
+
+<div class="input-container">
+    <div class="input-box">
+        <input type="text" id="linkInput" placeholder="분석할 링크를 입력하세요...">
+        <button class="add-btn" onclick="submitLink()">추가</button>
+    </div>
+</div>
+
+<div class="tab-bar">
+    <div class="tab active">전체</div>
+    <div class="tab">🗳️ 투표</div>
+    <div class="tab">📻 라디오</div>
+    <div class="tab">📢 정보/광고</div>
+</div>
+
+<div class="card-grid" id="mainGrid">
+    <div class="card">
+        <span class="tag tag-vote">VOTE</span>
+        <div class="card-title">아이돌 챔프 2월 월간 랭킹</div>
+        <a href="#" class="go-link">투표하러 가기</a>
+    </div>
+    <div class="card">
+        <span class="tag tag-radio">RADIO</span>
+        <div class="card-title">밤의 라디오: 보이는 라디오</div>
+        <a href="#" class="go-link">채널 바로가기</a>
+    </div>
+</div>
+
+<script>
+    function submitLink() {
+        const input = document.getElementById('linkInput');
+        const url = input.value;
+        if(!url) return alert("링크를 넣어주세요!");
+
+        alert("PLAVEPLLI 분석 시스템이 가동됩니다! 시트와 곧 연결됩니다.");
+        // 여기에 이후 GAS 연결 코드가 들어갈 예정입니다.
+        input.value = "";
+    }
+</script>
+
+</body>
+</html>
