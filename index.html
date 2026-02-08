@@ -281,64 +281,72 @@ async function deleteLink(url) {
         }
     }
 
-    function renderCards(rows) {
-        const grid = document.getElementById('mainGrid');
-        grid.innerHTML = ''; 
-        const now = new Date();
+function renderCards(rows) {
+    const grid = document.getElementById('mainGrid');
+    grid.innerHTML = ''; 
+    const now = new Date();
 
-        if (!rows || rows.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터가 없습니다.</div>';
-            return;
-        }
-
-        // 필터링: 현재 탭(태그)에 맞고 마감 전인 것만
-        const filteredRows = rows.filter(row => {
-            if (!row || !row[1]) return false;
-            if (row[3] !== selectedTag) return false; 
-            const deadline = row[6]; 
-            if (deadline && new Date(deadline) < now) return false;
-            return true;
-        });
-
-        if (filteredRows.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">활성화된 '${selectedName}' 정보가 없습니다.</div>`;
-            return;
-        }
-
-        filteredRows.reverse().forEach(row => {
-            const [date, link, category, tag, title, startTime, deadline] = row;
-            const card = document.createElement('div');
-            card.className = 'card';
-
-            const start = startTime ? new Date(startTime) : null;
-            const end = deadline ? new Date(deadline) : null;
-            
-            let isUpcoming = start && start > now;
-            let tagClass = isUpcoming ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info');
-            
-            let statusHtml = '';
-            if (isUpcoming) {
-                statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${start.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
-                card.style.opacity = "0.8";
-            } else if (end) {
-                const diff = end - now;
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                let text = d > 0 ? `D-${d}` : (h > 0 ? `임박 (${h}시간)` : "곧 마감!");
-                statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${text}</div>`;
-            }
-
-            card.innerHTML = `
-                <div>
-                    <span class="tag ${tagClass}">${isUpcoming ? 'UPCOMING' : (tag || 'INFO')}</span>
-                    <div class="card-title">${title || '공유된 정보'}</div>
-                    ${statusHtml}
-                </div>
-                <a href="${link}" target="_blank" class="go-btn">${isUpcoming ? '미리보기' : '바로가기'}</a>
-            `;
-            grid.appendChild(card);
-        });
+    if (!rows || rows.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터가 없습니다.</div>';
+        return;
     }
+
+    // 필터링: 현재 탭(태그)에 맞고 마감 전인 것만
+    const filteredRows = rows.filter(row => {
+        if (!row || !row[1]) return false;
+        if (row[3] !== selectedTag) return false; 
+        const deadline = row[6]; 
+        if (deadline && new Date(deadline) < now) return false;
+        return true;
+    });
+
+    if (filteredRows.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">활성화된 '${selectedName}' 정보가 없습니다.</div>`;
+        return;
+    }
+
+    filteredRows.reverse().forEach(row => {
+        const [date, link, category, tag, title, startTime, deadline] = row;
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const start = startTime ? new Date(startTime) : null;
+        const end = deadline ? new Date(deadline) : null;
+        
+        let isUpcoming = start && start > now;
+        let tagClass = isUpcoming ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info');
+        
+        let statusHtml = '';
+        if (isUpcoming) {
+            statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${start.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
+            card.style.opacity = "0.8";
+        } else if (end) {
+            const diff = end - now;
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            let text = d > 0 ? `D-${d}` : (h > 0 ? `임박 (${h}시간)` : "곧 마감!");
+            statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${text}</div>`;
+        }
+
+        // [핵심] 편집 모드일 때만 삭제 버튼 생성
+        const deleteBtn = isEditMode ? `<button onclick="deleteLink('${link}')" style="background: #ff7675; color: white; border: none; border-radius: 8px; padding: 5px 10px; font-size: 10px; cursor: pointer; font-weight: bold;">삭제</button>` : '';
+
+        // 카드의 HTML 구조를 하나로 통합 (중복 제거)
+        card.innerHTML = `
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                    <span class="tag ${tagClass}">${isUpcoming ? 'UPCOMING' : (tag || 'INFO')}</span>
+                    ${deleteBtn}
+                </div>
+                <div class="card-title">${title || '공유된 정보'}</div>
+                ${statusHtml}
+            </div>
+            <a href="${link}" target="_blank" class="go-btn">${isUpcoming ? '미리보기' : '바로가기'}</a>
+        `;
+        
+        grid.appendChild(card);
+    });
+}
 
     window.onload = fetchCards;
 </script>
