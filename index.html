@@ -129,7 +129,7 @@
 <body>
 
 <header>
-    <div class="logo">결 (Kyul)</div>
+    <div class="logo">plaveplli투표광고라디오정보공유</div>
 </header>
 
 <div class="input-container">
@@ -160,15 +160,39 @@
 </div>
 
 <script>
-    function submitLink() {
-        const input = document.getElementById('linkInput');
-        const url = input.value;
-        if(!url) return alert("링크를 넣어주세요!");
+async function submitLink() {
+    const input = document.getElementById('linkInput');
+    const url = input.value;
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyOqz60xfz0jNomAlfc3E_eTAM93-7paIZIeYKcRcpGkvAXItgFA54bmxkAIs3vHlMdNg/exec"; 
 
-        alert("PLAVEPLLI 분석 시스템이 가동됩니다! 시트와 곧 연결됩니다.");
-        // 여기에 이후 GAS 연결 코드가 들어갈 예정입니다.
+    if(!url) return alert("링크를 넣어주세요!");
+
+    // UI 피드백
+    const btn = document.querySelector('.add-btn');
+    btn.innerText = "분석 중...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ url: url })
+        });
+        
+        const result = await response.json();
+        
+        if(result.result === "success") {
+            alert(`분석 완료! 카테고리: ${result.category}`);
+            location.reload(); // 등록 후 화면 새로고침
+        }
+    } catch (error) {
+        console.error("오류 발생:", error);
+        alert("등록에 실패했습니다.");
+    } finally {
+        btn.innerText = "추가";
+        btn.disabled = false;
         input.value = "";
     }
+}
 </script>
 
 </body>
