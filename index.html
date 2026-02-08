@@ -84,46 +84,73 @@
             gap: 15px;
             padding: 0 20px 40px;
         }
-        .card {
-            background: var(--card-white);
-            border-radius: 18px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-            transition: 0.3s;
-        }
-        .tag {
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 8px;
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        .tag-vote { background: var(--pink); }
-        .tag-radio { background: var(--blue); }
-        .tag-info { background: var(--purple); }
+.card {
+    background: var(--card-white);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 10px 20px rgba(255, 145, 175, 0.05); /* 은은한 핑크 그림자 */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 145, 175, 0.12);
+}
 
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            line-height: 1.4;
-            height: 40px;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-        .go-link {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            padding: 8px;
-            background: #f8f8f8;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text);
-            font-size: 12px;
-        }
+.tag {
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: #fff; /* 파스텔 배경엔 흰색 글씨도 예뻐요 */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.tag-vote { background: linear-gradient(135deg, #ffdee9 0%, #ffb7ca 100%); color: #d64e71; }
+.tag-radio { background: linear-gradient(135deg, #e1f1ff 0%, #b2d8ff 100%); color: #4e86d6; }
+.tag-info { background: linear-gradient(135deg, #efe9ff 0%, #d1c4ff 100%); color: #735ed6; }
+
+.card-title {
+    font-size: 15px;
+    margin: 12px 0;
+    color: #444;
+    word-break: break-all;
+}
+
+.go-link {
+    background: #fdfaf6;
+    border: 1.5px solid var(--pink);
+    color: var(--point);
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.go-link:hover {
+    background: var(--pink);
+    color: white;
+}
+
+/* 추가 로딩 애니메이션 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: fadeIn 0.5s ease forwards; }
+    
+        /* 상태별 버튼 스타일 */
+.go-link.status-upcoming {
+    border-color: #eee;
+    color: #999;
+    cursor: default;
+}
+.go-link.status-nolink {
+    border-color: var(--purple);
+    color: var(--text);
+    background: var(--purple);
+    opacity: 0.7;
+}
     </style>
 </head>
 <body>
@@ -160,7 +187,7 @@
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwtp1iKx-mgnG3yw9E5uxwzUukPd8iCKuSkfGb9jJnHGmrTUpu6EX17_sjQUrcIT5X4Vg/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyJmD6uVCVH1xdGtReoo-BAUhUkTWrygkEPxie-iY0qNJ1JgS-WSXM2MZDotkqRseRPAQ/exec";
 const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
 let allData = []; // 전체 데이터를 저장할 변수
 
@@ -221,9 +248,26 @@ function renderCards(dataList) {
     dataList.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card';
+        
+        // 상태에 따른 버튼 처리
+        let btnAttr = `href="${item.url}" target="_blank"`;
+        let btnText = "바로가기";
+        let btnClass = "go-link";
+
+        if (item.status === "투표예정") {
+            btnText = "🗓️ 투표 예정";
+            btnClass += " status-upcoming";
+            btnAttr = "onclick='alert(\"아직 투표 기간이 아닙니다!\")'";
+        } else if (!item.url || item.url === "undefined" || item.url.includes("링크없음")) {
+            btnText = "🔍 앱 내 확인";
+            btnClass += " status-nolink";
+            btnAttr = "onclick='alert(\"이 투표는 해당 앱 내부에서 직접 진행해 주세요.\")'";
+        }
+
         card.innerHTML = `
             <span class="tag tag-${item.tag.toLowerCase()}">${item.tag}</span>
-            <div class="card-title">${item.title}</div> <a href="${item.url}" target="_blank" class="go-link">바로가기</a>
+            <div class="card-title">${item.title}</div>
+            <a ${btnAttr} class="${btnClass}">${btnText}</a>
         `;
         grid.appendChild(card);
     });
