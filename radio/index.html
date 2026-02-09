@@ -4,25 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PLLI-TUB-RA | 라디오 신청</title>
- <script>
-  // Vercel 환경 변수를 브라우저 변수로 연결해주는 다리 역할입니다.
-  window.API_KEY_ENV = "<%= API_KEY %>"; 
-</script>
-<script src="config.js"></script>
 
-<script>
-    // 2. config.js에 정의된 CONFIG 객체에서 값을 가져와 연결합니다.
-    
-    const API_KEY = CONFIG.API_KEY;
-    const SHEET_ID = CONFIG.GOOGLE.SHEET_ID;
-    const GAS_URL = CONFIG.GOOGLE.GAS_URL;
-    
-    // Firebase 설정도 객체 통째로 가져옵니다.
-    const firebaseConfig = CONFIG.FIREBASE;
+    <script src="../env-config.js"></script> 
+    <script src="../config.js"></script>
 
-    // 이제 이 아래에서 기존처럼 Firebase 초기화나 구글 시트 호출을 하면 됩니다!
-    // 예: firebase.initializeApp(firebaseConfig);
-</script>
+    <script>
+        // CONFIG 객체에서 값을 가져와 연결합니다.
+        // Vercel 환경 변수가 있으면 그걸 쓰고, 없으면 CONFIG 값을 씁니다.
+        const API_KEY = window.API_KEY_ENV || CONFIG.API_KEY;
+        const SHEET_ID = CONFIG.SPREADSHEET_ID; 
+        const GAS_URL = CONFIG.GAS_URL;
+        const firebaseConfig = CONFIG.FIREBASE;
+
+        console.log("라디오 스테이션 보안 연결 완료! 📻");
+    </script>
 
     <script src="radio_script.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
