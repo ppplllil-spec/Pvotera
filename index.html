@@ -196,38 +196,47 @@
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
     </div>
 
-    <div id="mainLayout">
+<div id="mainLayout">
         <div id="gridContainer">
             <div class="card-grid" id="grid"></div>
         </div>
 
         <div class="sidebar">
+            
             <div class="glass-panel">
                 <div style="font-weight: 900; margin-bottom: 10px;">📢 NOTICE</div>
                 <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div>
             </div>
-            <div class="glass-panel" style="margin-top: 40px; border: 2px solid var(--accent);">
+
+            <div class="glass-panel" style="border: 2px solid var(--accent);">
                 <div style="font-weight: 900; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center;">
                     <span>🎧 나만의 실시간 뮤밍리스트</span>
-                    <div id="totalTimeDisplay" style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 12px;">총 0분 0초</div>
+                    <div id="totalTimeDisplay" style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 12px;">0분 0초</div>
                 </div>
-                <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;"></div>
-                <div id="builderGrid" style="min-height: 50px;"></div>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555;">▶ 전체 순서대로 재생</button>
-                    <button onclick="clearBuilder()" class="go-btn" style="flex: 0.4; border: 1px solid #ddd;">전체 삭제</button>
+                
+                <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
+                
+                <div id="builderGrid" style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;"></div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 8px;">
+                    <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555; padding: 12px; font-size: 12px;">▶ 전체 재생</button>
+                    <button onclick="clearBuilder()" class="go-btn" style="flex: 0.5; border: 1px solid #ddd; padding: 12px; font-size: 12px;">비우기</button>
                 </div>
             </div>
+
             <div class="glass-panel" style="height: 450px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                     <span>💬 플리 대기실</span>
-                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer;">(변경)</button>
+                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer; opacity: 0.7;">(닉네임 변경)</button>
                 </div>
-                <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
-                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
+                <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:12px; font-size:12px; margin-bottom:10px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="chatInput" class="input-box" style="margin-bottom:0; flex: 1;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
+                    <button onclick="window.sendChat()" class="check-btn" style="flex: 0.3; padding: 0 15px;">전송</button>
+                </div>
             </div>
-        </div>
-    </div>
+
+        </div> 
 </div>
 
 <div id="thanksPopup" class="thanks-popup">💙 소중한 제보 감사해요! 플리님! 💙</div>
