@@ -43,7 +43,22 @@
             opacity: 0.3; z-index: -1; pointer-events: none;
         }
         @keyframes stars { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
-
+/* 수정된 감사 팝업 스타일 */
+.thanks-popup { 
+    position: fixed; 
+    bottom: 100px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background: white; 
+    color: #6c5ce7; 
+    padding: 12px 25px; 
+    border-radius: 50px; 
+    font-weight: 900; 
+    z-index: 5000; 
+    display: none; /* 👈 이 부분을 추가하면 평소에는 숨겨집니다! */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+    border: 2px solid var(--neon-purple); /* 보랏빛 테두리도 살짝 추가했어요 */
+}
         /* 2. 마우스 별가루 스타일 */
         .particle {
             position: fixed; top: 0; left: 0; width: 6px; height: 6px;
