@@ -123,18 +123,91 @@
                 <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div>
             </div>
             <div class="glass-panel" style="height: 450px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 10px;">💬 플리 대기실</div>
+                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                    <span>💬 플리 대기실</span>
+                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer;">(변경)</button>
+                </div>
                 <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
-                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) sendChat()">
+                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
             </div>
         </div>
     </div>
 </div>
 
+<script type="module">
+    // Firebase SDK 및 함수 임포트
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // ⚠️ Firebase 설정값을 여기에 정확히 붙여넣으세요!
+    const firebaseConfig = {
+        apiKey: "...",
+        authDomain: "...",
+        databaseURL: "...",
+        projectId: "...",
+        storageBucket: "...",
+        messagingSenderId: "...",
+        appId: "..."
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const chatRef = ref(db, 'chats');
+
+    // 닉네임 관리 로직
+    let myNick = localStorage.getItem('chatNickname');
+    if (!myNick) {
+        myNick = prompt("사용하실 닉네임을 입력해주세요! (최대 8자)", "익명플리");
+        if (!myNick || myNick.trim() === "") myNick = "익명플리";
+        myNick = myNick.substring(0, 8);
+        localStorage.setItem('chatNickname', myNick);
+    }
+
+    // 닉네임 변경 함수 (전역 등록)
+    window.changeNick = function() {
+        const newNick = prompt("새로운 닉네임을 입력하세요.");
+        if (newNick && newNick.trim() !== "") {
+            localStorage.setItem('chatNickname', newNick.substring(0, 8));
+            location.reload();
+        }
+    };
+
+    // 메시지 전송 함수 (전역 등록)
+    window.sendChat = function() {
+        const input = document.getElementById('chatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        push(chatRef, {
+            nick: myNick,
+            msg: msg,
+            time: Date.now()
+        });
+        input.value = '';
+    };
+
+    // 메시지 실시간 수신
+    onChildAdded(chatRef, (data) => {
+        const chat = data.val();
+        const chatMessages = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.style.marginBottom = "8px";
+        div.style.fontSize = "13px";
+        
+        const isMe = chat.nick === myNick;
+        const nickColor = isMe ? "var(--accent)" : "#555";
+        const nickFont = isMe ? "900" : "700";
+
+        div.innerHTML = `<span style="color:${nickColor}; font-weight:${nickFont};">[${chat.nick}]</span> ${chat.msg}`;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+</script>
+
 <script>
+    // 기존 앱 로직
     const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
     const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx5jBbKaONQU62KrtuBPEtF4vP4ntG5jxOIshDcEQ7QokutyqAEOUu-U0DQMXTKQjwbEg/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
     
     let currentSheet = 'data', cachedData = [], isAdmin = false, tempWebP = "";
     let builderData = JSON.parse(localStorage.getItem('plaveBuilder') || '[]');
@@ -143,7 +216,6 @@
         if(prompt("관리자 비밀번호를 입력하세요.") === "0312") {
             isAdmin = true;
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            // 관리자 모드 시 텍스트박스에 현재 공지 내용 채워넣기
             const currentNotices = document.getElementById('noticeDisplay').innerText.replace(/• /g, '');
             document.getElementById('noticeInput').value = currentNotices;
             renderCards();
@@ -163,15 +235,9 @@
         const btn = document.getElementById('noticeBtn');
         const text = document.getElementById('noticeInput').value.trim();
         if(!text) return alert("공지 내용을 입력하세요.");
-        
         btn.innerText = "저장 중...";
         const noticeList = text.split('\n').map(line => [line]);
-        
-        const res = await fetch(GAS_URL, { 
-            method: "POST", 
-            body: JSON.stringify({ action: "updateNotice", notices: noticeList }) 
-        });
-        
+        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "updateNotice", notices: noticeList }) });
         if((await res.json()).result === "success") {
             alert("공지사항이 업데이트되었습니다!");
             loadNotice();
@@ -179,7 +245,6 @@
         }
     }
 
-    // --- (이하 나머지 기존 함수들은 위와 동일하게 유지) ---
     async function fetchData() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`;
         try {
@@ -214,17 +279,50 @@
         });
     }
 
-    function sendChat() {
-        const input = document.getElementById('chatInput');
-        const msg = input.value.trim();
-        if(!msg) return;
-        const chatBox = document.getElementById('chatMessages');
-        const div = document.createElement('div');
-        div.style.marginBottom = "5px";
-        div.innerHTML = `<b>익명플리:</b> ${msg}`;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        input.value = '';
+    // 퀵 등록 관련 함수들
+    async function loadQuickMenuFromRadio() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
+        try {
+            const r = await fetch(url).then(res => res.json());
+            const radioData = r.values || [];
+            const btnContainer = document.getElementById('quickBtns');
+            btnContainer.innerHTML = ''; 
+            radioData.forEach(row => {
+                const title = row[4], link = row[10], timeInfo = row[13];
+                if (title && link) {
+                    let min = 0, sec = 0;
+                    if (timeInfo) {
+                        const timeMatch = timeInfo.match(/(\d+):(\d+)/) || timeInfo.match(/(\d+)분\s*(\d+)초/);
+                        if (timeMatch) { min = parseInt(timeMatch[1]); sec = parseInt(timeMatch[2]); }
+                    }
+                    const ytLink = link.split(/[\s,]+/).find(l => l.includes('youtu')) || link.split(/[\s,]+/)[0];
+                    const btn = document.createElement('button');
+                    btn.className = 'chip'; btn.innerHTML = `🔥 ${title}`;
+                    btn.onclick = () => quickAdd(title, ytLink, min, sec);
+                    btnContainer.appendChild(btn);
+                }
+            });
+        } catch (e) { console.error("퀵 메뉴 로드 실패:", e); }
+    }
+
+    function quickAdd(title, url, min, sec) {
+        builderData.push({ title, url, min, sec, id: Date.now() });
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
+        const grid = document.getElementById('builderGrid');
+        grid.innerHTML = '';
+        let totalSec = 0;
+        builderData.forEach((item, index) => {
+            totalSec += (item.min * 60) + item.sec;
+            const div = document.createElement('div'); div.className = 'builder-item';
+            div.innerHTML = `<div style="font-size:12px;"><b>${item.title}</b> (${item.min}:${item.sec}) <button onclick="removeFromBuilder(${index})" style="border:none; background:none; color:red; cursor:pointer;">×</button></div>`;
+            grid.appendChild(div);
+        });
+        const m = Math.floor(totalSec / 60), s = totalSec % 60;
+        document.getElementById('totalTimeDisplay').innerText = `총 ${m}분 ${s}초`;
     }
 
     function openPlayer(url) { window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes"); }
@@ -232,6 +330,22 @@
     function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
     function setCat(b, s) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); currentSheet=s; fetchData(); }
     function updateFileName(input) { document.getElementById('fileNameDisplay').innerText = input.files[0] ? input.files[0].name : "선택된 파일 없음"; processWebP(input); }
+    function removeFromBuilder(idx) { builderData.splice(idx, 1); saveAndRender(); }
+    function clearBuilder() { if(confirm("비울까요?")) { builderData = []; saveAndRender(); } }
+
+    async function processWebP(input) {
+        if(!input.files[0]) return;
+        const file = input.files[0];
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            canvas.width = 800; canvas.height = (800/img.width)*img.height;
+            ctx.drawImage(img, 0, 0, 800, canvas.height);
+            tempWebP = canvas.toDataURL('image/webp', 0.7).split(',')[1];
+        };
+    }
 
     async function submitData() {
         const btn = document.getElementById('subBtn');
@@ -247,7 +361,12 @@
         if((await res.json()).result === "success") { alert("등록 완료!"); location.reload(); }
     }
 
-    window.onload = () => { fetchData(); loadNotice(); loadQuickMenuFromRadio(); saveAndRender(); };
+    window.onload = () => { 
+        fetchData(); 
+        loadNotice(); 
+        loadQuickMenuFromRadio(); 
+        saveAndRender(); 
+    };
 </script>
 </body>
 </html>
