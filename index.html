@@ -53,7 +53,30 @@
 
 <div class="container">
     <header><div class="logo">PL-TUB-RA</div></header>
+    <div class="glass-input-panel" style="background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.3);">
+    <div style="font-size: 14px; font-weight: 800; margin-bottom: 15px; color: white;">✨ 새로운 정보 등록</div>
     
+    <select id="sheetSelect" class="search-box" style="margin-bottom: 10px;">
+        <option value="data">🗳️ 투표 / 📢 정보 (data)</option>
+        <option value="streaming">🎧 뮤밍 리스트 (streaming)</option>
+    </select>
+
+    <input type="text" id="regLink" class="search-box" style="margin-bottom: 10px;" placeholder="🔗 등록할 사이트 링크">
+    <input type="text" id="regTitle" class="search-box" style="margin-bottom: 10px;" placeholder="📝 제목 입력">
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+            <label style="font-size: 11px; color: white; font-weight: bold; display: block; margin-bottom: 5px;">⏰ 마감 일시 (선택)</label>
+            <input type="datetime-local" id="regDeadline" class="search-box" style="margin-bottom: 0;">
+        </div>
+        <div style="flex: 1;">
+            <label style="font-size: 11px; color: white; font-weight: bold; display: block; margin-bottom: 5px;">🖼️ 이미지 (선택)</label>
+            <input type="file" id="regFile" accept="image/*" style="font-size: 11px; color: white; width: 100%;">
+        </div>
+    </div>
+
+    <button onclick="submitData()" id="subBtn" style="width: 100%; padding: 15px; border-radius: 15px; border: none; background: white; color: var(--accent); font-weight: 800; cursor: pointer; transition: 0.3s;">등록하기</button>
+</div>
     <input type="text" id="search" class="search-box" placeholder="어떤 정보를 찾으시나요?" oninput="renderCards()">
 
     <div class="cat-group">
