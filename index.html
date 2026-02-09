@@ -6,142 +6,127 @@
     <title>플리튭라정보</title>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
         :root {
-            --bg-top: #c5c9f4;
-            --bg-bottom: #fbc2eb;
-            --glass-white: rgba(255, 255, 255, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-color: #4b4b7c;
-            --accent-pink: #ff85a1;
-            --accent-blue: #7d93eb;
+            --bg-top: #c5c9f4; --bg-bottom: #fbc2eb;
+            --glass-white: rgba(255, 255, 255, 0.4); --glass-border: rgba(255, 255, 255, 0.6);
+            --text-color: #4b4b7c; --accent-pink: #ff85a1; --accent-blue: #7d93eb;
         }
-
         body {
             font-family: 'Pretendard', sans-serif;
             background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-            background-attachment: fixed;
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
+            background-attachment: fixed; margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--text-color);
         }
-
         body::before {
             content: "♥"; position: fixed; top: 15%; right: 10%;
-            font-size: 150px; color: rgba(255, 255, 255, 0.2);
-            filter: blur(5px); z-index: -1;
+            font-size: 150px; color: rgba(255, 255, 255, 0.2); filter: blur(5px); z-index: -1;
         }
-
         .container { width: 100%; max-width: 480px; }
         header { text-align: center; padding: 30px 0; }
         .logo { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); letter-spacing: -1px; }
-
         .glass-input-panel {
-            background: var(--glass-white);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 30px;
-            padding: 25px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            background: var(--glass-white); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px; padding: 25px; border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px;
         }
-
-        .input-row input {
+        .input-row input, .input-row select {
             width: 100%; border: none; background: rgba(255,255,255,0.3);
             border-radius: 15px; padding: 15px; margin-bottom: 12px;
-            font-size: 14px; outline: none; color: var(--text-color);
-            box-sizing: border-box;
+            font-size: 14px; outline: none; color: var(--text-color); box-sizing: border-box; font-family: inherit;
         }
-
         .cat-group { display: flex; gap: 8px; margin-bottom: 15px; justify-content: center; }
         .chip {
             padding: 8px 18px; border-radius: 20px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.2); color: var(--text-color);
-            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
+            background: rgba(255,255,255,0.2); color: var(--text-color); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.3s;
         }
         .chip.active { background: white; color: var(--accent-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-
         .submit-btn {
             width: 100%; padding: 16px; border-radius: 20px; border: none;
-            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
-            color: white; font-weight: 800; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%); color: white; font-weight: 800; cursor: pointer;
         }
-
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        
         .card {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(10px);
-            border-radius: 25px; padding: 18px;
-            border: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 140px; transition: 0.3s;
+            background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(10px);
+            border-radius: 25px; padding: 18px; border: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; transition: 0.3s;
         }
-        .card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.6); }
-
         .tag { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 10px; width: fit-content; margin-bottom: 10px; color: white; }
         .tag-vote { background: var(--accent-pink); }
         .tag-info { background: var(--accent-blue); }
         .tag-upcoming { background: #b2bec3; }
-
         .card-title { font-size: 14px; font-weight: 700; line-height: 1.4; color: var(--text-color); margin-bottom: 10px; }
         .status-text { font-size: 11px; font-weight: 600; margin-bottom: 10px; }
-
         .go-btn {
-            text-align: center; text-decoration: none; padding: 8px;
-            background: rgba(255,255,255,0.5); border-radius: 12px;
-            font-size: 12px; font-weight: 800; color: var(--text-color);
+            text-align: center; text-decoration: none; padding: 8px; background: rgba(255,255,255,0.5);
+            border-radius: 12px; font-size: 12px; font-weight: 800; color: var(--text-color);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div class="logo">플리튭라정보공유</div>
-    </header>
-<div style="position: fixed; top: 20px; right: 20px; z-index: 100;">
-    <button onclick="toggleEditMode()" style="background: var(--glass-white); border: 1px solid var(--glass-border); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">⚙️</button>
-</div>
+    <header><div class="logo">플리튭라정보공유</div></header>
+    
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 100;">
+        <button onclick="toggleEditMode()" style="background: var(--glass-white); border: 1px solid var(--glass-border); border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 20px;">⚙️</button>
+    </div>
+
     <div class="glass-input-panel">
         <div class="input-row">
             <input type="text" id="linkInput" placeholder="🔗 공유할 링크를 넣어주세요">
             <input type="text" id="titleInput" placeholder="📝 제목/상세 내용을 적어주세요">
-        </div>
 
-<div id="voteAppArea" style="display:none; margin-bottom:12px;">
-    <label style="font-size:12px; color:white; font-weight:bold; margin-bottom:5px; display:block;">🗳️ 투표 앱 선택</label>
-    <select id="voteAppSelect" onchange="applyAppTitle()" style="width:100%; border:none; padding:15px; border-radius:15px; background:rgba(255,255,255,0.6); color:var(--text-color); font-family: inherit; font-size:14px; outline:none;">
-        <option value="">-- 투표 앱을 선택하세요 --</option>
-        <option value="주간인기상">주간인기상</option>
-        <option value="최애돌">최애돌</option>
-        <option value="하이어">하이어</option>
-        <option value="딩고">딩고</option>
-        <option value="스타트렌드">스타트렌드</option>
-        <option value="링크/tin">링크/tin</option>
-        <option value="마이원픽">마이원픽</option>
-        <option value="뮤니버스">뮤니버스</option>
-        <option value="뮤빗">뮤빗</option>
-        <option value="벅스">벅스</option>
-        <option value="후즈팬">후즈팬</option>
-        <option value="팬앤스타">팬앤스타</option>
-        <option value="팬캐스트">팬캐스트</option>
-        <option value="팬플러스">팬플러스</option>
-        <option value="포도알">포도알</option>
-        <option value="피크닠">피크닠</option>
-        <option value="아이도키">아이도키</option>
-        <option value="아이돌챔프">아이돌챔프</option>
-        <option value="아이돌픽">아이돌픽</option>
-        <option value="유센">유센</option>
-        <option value="유픽">유픽</option>
-        <option value="셀럽챔프">셀럽챔프</option>
-        <option value="스타덤">스타덤</option>
-        <option value="기타">기타(직접입력)</option>
-    </select>
-</div>
+            <div id="voteAppArea" style="display:none;">
+                <select id="voteAppSelect" onchange="applyAppTitle()">
+                    <option value="">-- 투표 앱을 선택하세요 --</option>
+                    <option value="주간인기상">주간인기상</option><option value="최애돌">최애돌</option>
+                    <option value="하이어">하이어</option><option value="딩고">딩고</option>
+                    <option value="스타트렌드">스타트렌드</option><option value="링크/tin">링크/tin</option>
+                    <option value="마이원픽">마이원픽</option><option value="뮤니버스">뮤니버스</option>
+                    <option value="뮤빗">뮤빗</option><option value="벅스">벅스</option>
+                    <option value="후즈팬">후즈팬</option><option value="팬앤스타">팬앤스타</option>
+                    <option value="팬캐스트">팬캐스트</option><option value="팬플러스">팬플러스</option>
+                    <option value="포도알">포도알</option><option value="피크닠">피크닠</option>
+                    <option value="아이도키">아이도키</option><option value="아이돌챔프">아이돌챔프</option>
+                    <option value="아이돌픽">아이돌픽</option><option value="유센">유센</option>
+                    <option value="유픽">유픽</option><option value="셀럽챔프">셀럽챔프</option>
+                    <option value="스타덤">스타덤</option><option value="기타">기타(직접입력)</option>
+                </select>
+            </div>
+
+            <div id="radioAppArea" style="display:none;">
+                <select id="radioAppSelect" onchange="applyRadioTitle()">
+                    <option value="">-- 라디오 채널을 선택하세요 --</option>
+                    <optgroup label="🇰🇷 국내 KBS">
+                        <option value="https://program.kbs.co.kr/2fm/radio/stationzero/mobile/board.html?smenu=e5c2d2&bbs_loc=R2024-0068-03-4183,list,none,1,0">K-스테제로</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/stationx/mobile/board.html?smenu=f2fa28&bbs_loc=R2024-0203-03-105048,list,none,1,0">K-스테엑스</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/ejgayo/mobile/board.html?smenu=ebbbd1&bbs_loc=R2023-0057-03-858128,list,none,1,0">K-가yo광장</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/superradio/mobile/board.html?smenu=654b54&bbs_loc=R2024-0241-03-865497,list,none,1,0">K-Ha슈퍼</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/misterradio/mobile/board.html?smenu=e5c2d2&bbs_loc=A2019-0002-03-50838,list,none,1,0">K-미스터라디오</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/hyojung_volume/mobile/board.html?smenu=1a3558&bbs_loc=R2024-0245-03-718543,list,none,1,0">K-볼륨up(금)</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/hyojung_volume/mobile/board.html?smenu=8d08c6&bbs_loc=R2024-0245-03-873759,list,none,1,0">K-볼륨up(토)</option>
+                        <option value="https://program.kbs.co.kr/2fm/radio/hyojung_volume/mobile/board.html?smenu=13fca5&bbs_loc=R2024-0245-03-94886,list,none,1,0">K-볼륨up(일)</option>
+                    </optgroup>
+                    <optgroup label="🇰🇷 국내 SBS">
+                        <option value="https://m.programs.sbs.co.kr/radio/sbs12n/boards/83474">S-12시엔</option>
+                        <option value="https://m.programs.sbs.co.kr/radio/cultwoshow/boards/58047">S-컬투쇼</option>
+                        <option value="https://m.programs.sbs.co.kr/radio/kingcastlepower/boards/74230">S-황파</option>
+                        <option value="https://m.programs.sbs.co.kr/radio/lovegame/boards/57679">S-럽겜</option>
+                        <option value="https://m.programs.sbs.co.kr/radio/wendy0s/boards/69691">S-영슽트</option>
+                        <option value="https://m.programs.sbs.co.kr/radio/ten/boards/57950">S-배텐</option>
+                        <option value="https://programs.sbs.co.kr/radio/0chulpowerfm/cornerboards/57577/?cornerid=3005&cmd=list">S-0철 파월</option>
+                    </optgroup>
+                    <optgroup label="🌎 해외 라디오">
+                        <option value="https://docs.google.com/forms/d/e/1FAIpQLSfyVYf-rss5jZ0uA6RHIkb-Im180whM7I_U98HLnpu3w1C4cw/viewform">WPVR 뉴욕 (폼)</option>
+                        <option value="https://x.com/i/communities/1707176199129014533">WPVR 뉴욕 (커뮤니티)</option>
+                        <option value="https://www.bossglobalradio.com/request">Boss Global (1분 청취후)</option>
+                        <option value="https://onlyhit.us/en/contact/">Only Hit</option>
+                        <option value="http://hot106.cgrmedia.ca/request">Hot 106 (Canada)</option>
+                        <option value="http://m-on.jp/request/">M-ON (Japan)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
 
         <div class="cat-group">
             <button class="chip active" onclick="setCat(this, 'INFO', '정보/광고')">📢 정보</button>
@@ -175,181 +160,131 @@
     const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
     const SHEET_ID = "1nf0XEDSj5kc0k29pWKaCa345aUG0-3RmofWqd4bRZ9M";
 
-    let selectedTag = 'INFO';
-    let selectedName = '정보/광고';
-    let cachedRows = []; // 데이터를 저장해둘 변수 추가
+    let selectedTag = 'INFO', selectedName = '정보/광고', cachedRows = [], isEditMode = false;
+    const ADMIN_PW = "0312", RADIO_MESSAGES = {
+        GLOBAL: "I would like to request [제목] by [가수명] ✨",
+        BOSS: "[Boss Global] 1분 청취 후 신청곡을 남겨주세요! 🎧",
+        KOREA: "사연과 신청곡 부탁드려요! 📻"
+    };
 
     function setCat(btn, tag, name) {
         document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        selectedTag = tag;
-        selectedName = name;
+        selectedTag = tag; selectedName = name;
         
-        const isVote = (tag === 'VOTE');
-        document.getElementById('voteAppArea').style.display = isVote ? 'block' : 'none';
-        document.getElementById('timeArea').style.display = isVote ? 'block' : 'none';
+        document.getElementById('voteAppArea').style.display = (tag === 'VOTE') ? 'block' : 'none';
+        document.getElementById('radioAppArea').style.display = (tag === 'RADIO') ? 'block' : 'none';
+        document.getElementById('timeArea').style.display = (tag === 'VOTE' || tag === 'RADIO') ? 'block' : 'none';
         
-        // 탭을 바꿀 때 저장된 데이터로 다시 그리기
         renderCards(cachedRows);
     }
 
     function applyAppTitle() {
-        const select = document.getElementById('voteAppSelect');
+        const val = document.getElementById('voteAppSelect').value;
+        if(val && val !== "기타") document.getElementById('titleInput').value = `[${val}] 투표 부탁드려요!`;
+    }
+
+    function applyRadioTitle() {
+        const select = document.getElementById('radioAppSelect');
+        const linkInput = document.getElementById('linkInput');
         const titleInput = document.getElementById('titleInput');
-        if(select.value && select.value !== "기타") {
-            titleInput.value = `[${select.value}] 투표 부탁드려요!`;
+        if(select.value) {
+            linkInput.value = select.value;
+            const text = select.options[select.selectedIndex].text;
+            if (text.includes('Boss Global')) titleInput.value = RADIO_MESSAGES.BOSS;
+            else if (text.includes('WPVR') || text.includes('Only') || text.includes('Hot') || text.includes('Japan')) titleInput.value = RADIO_MESSAGES.GLOBAL;
+            else titleInput.value = `[${text}] ${RADIO_MESSAGES.KOREA}`;
         }
+    }
+
+    function toggleEditMode() {
+        if (prompt("관리자 비밀번호를 입력하세요.") === ADMIN_PW) {
+            isEditMode = !isEditMode;
+            alert(isEditMode ? "편집 모드 활성화 🛠️" : "편집 모드 해제");
+            renderCards(cachedRows);
+        } else alert("비밀번호가 틀렸습니다.");
+    }
+
+    async function deleteLink(url) {
+        if (!confirm("이 항목을 정말 삭제할까요?")) return;
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: "delete", url: url }) });
+        const data = await res.json();
+        if (data.result === "success") { alert("삭제되었습니다."); location.reload(); }
     }
 
     async function submitLink() {
-        const urlInput = document.getElementById('linkInput');
-        const titleInput = document.getElementById('titleInput');
-        const startInput = document.getElementById('startInput');
-        const deadlineInput = document.getElementById('deadlineInput');
-
-        if(!urlInput.value) return alert("링크를 입력해 주세요! ✨");
-
+        const url = document.getElementById('linkInput').value;
+        if(!url) return alert("링크를 입력해 주세요!");
         const btn = document.querySelector('.submit-btn');
-        btn.innerText = "🚀 등록 중...";
-        btn.disabled = true;
+        btn.innerText = "🚀 등록 중..."; btn.disabled = true;
 
-        try {
-            await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ 
-                    url: urlInput.value,
-                    userTitle: titleInput.value,
-                    category: selectedName,
-                    tag: selectedTag,
-                    startTime: startInput.value,
-                    deadline: deadlineInput.value 
-                })
-            });
-            alert("성공적으로 등록되었습니다! 💖");
-            location.reload();
-        } catch (e) {
-            alert("등록 실패! 주소나 권한 설정을 확인해 주세요.");
-            btn.innerText = "등록하기";
-            btn.disabled = false;
-        }
-    }
-let isEditMode = false;
-const ADMIN_PW = "0312"; // 여기에 원하는 비밀번호를 설정하세요!
-
-function toggleEditMode() {
-    const pw = prompt("관리자 비밀번호를 입력하세요.");
-    if (pw === ADMIN_PW) {
-        isEditMode = !isEditMode;
-        alert(isEditMode ? "편집 모드가 활성화되었습니다. 🛠️" : "편집 모드가 해제되었습니다.");
-        renderCards(cachedRows); // 카드 다시 그리기
-    } else {
-        alert("비밀번호가 틀렸습니다.");
-    }
-}
-
-async function deleteLink(url) {
-    if (!confirm("이 항목을 정말 삭제할까요?")) return;
-
-    try {
-        const response = await fetch(GAS_URL, {
+        await fetch(GAS_URL, {
             method: 'POST',
             body: JSON.stringify({ 
-                action: "delete", 
-                url: url 
+                url: url, userTitle: document.getElementById('titleInput').value,
+                category: selectedName, tag: selectedTag,
+                startTime: document.getElementById('startInput').value,
+                deadline: document.getElementById('deadlineInput').value 
             })
         });
-        const res = await response.json();
-        if (res.result === "success") {
-            alert("삭제되었습니다.");
-            location.reload();
-        }
-    } catch (e) {
-        alert("삭제 중 오류가 발생했습니다.");
+        location.reload();
     }
-}
+
     async function fetchCards() {
-        const RANGE = '시트1!A2:G';
+        const RANGE = 'data!A2:G';
         const fetchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
         try {
             const response = await fetch(fetchUrl);
             const data = await response.json();
-            cachedRows = data.values || []; // 불러온 데이터를 캐시에 저장
+            cachedRows = data.values || [];
             renderCards(cachedRows);
-        } catch (error) {
-            console.error("데이터 로딩 오류:", error);
-            document.getElementById('mainGrid').innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터를 불러올 수 없습니다.</div>';
-        }
+        } catch (e) { console.error(e); }
     }
 
-function renderCards(rows) {
-    const grid = document.getElementById('mainGrid');
-    grid.innerHTML = ''; 
-    const now = new Date();
+    function renderCards(rows) {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = ''; const now = new Date();
+        if (!rows || rows.length === 0) { grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터가 없습니다.</div>'; return; }
 
-    if (!rows || rows.length === 0) {
-        grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터가 없습니다.</div>';
-        return;
-    }
+        const filtered = rows.filter(r => {
+            if (!r || !r[1] || r[3] !== selectedTag) return false;
+            if (r[6] && new Date(r[6]) < now) return false;
+            return true;
+        });
 
-    // 필터링: 현재 탭(태그)에 맞고 마감 전인 것만
-    const filteredRows = rows.filter(row => {
-        if (!row || !row[1]) return false;
-        if (row[3] !== selectedTag) return false; 
-        const deadline = row[6]; 
-        if (deadline && new Date(deadline) < now) return false;
-        return true;
-    });
+        if (filtered.length === 0) { grid.innerHTML = `<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">활성화된 '${selectedName}' 정보가 없습니다.</div>`; return; }
 
-    if (filteredRows.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">활성화된 '${selectedName}' 정보가 없습니다.</div>`;
-        return;
-    }
+        filtered.reverse().forEach(row => {
+            const [date, link, category, tag, title, startTime, deadline] = row;
+            const card = document.createElement('div'); card.className = 'card';
+            const s = startTime ? new Date(startTime) : null, e = deadline ? new Date(deadline) : null;
+            let isUp = s && s > now, tagClass = isUp ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info'), statusHtml = '';
 
-    filteredRows.reverse().forEach(row => {
-        const [date, link, category, tag, title, startTime, deadline] = row;
-        const card = document.createElement('div');
-        card.className = 'card';
+            if (isUp) {
+                statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${s.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
+                card.style.opacity = "0.8";
+            } else if (e) {
+                const diff = e - now; const d = Math.floor(diff / (1000 * 60 * 60 * 24)); const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${d > 0 ? 'D-'+d : (h > 0 ? h+'시간 전' : '곧 마감!')}</div>`;
+            }
 
-        const start = startTime ? new Date(startTime) : null;
-        const end = deadline ? new Date(deadline) : null;
-        
-        let isUpcoming = start && start > now;
-        let tagClass = isUpcoming ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info');
-        
-        let statusHtml = '';
-        if (isUpcoming) {
-            statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${start.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
-            card.style.opacity = "0.8";
-        } else if (end) {
-            const diff = end - now;
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            let text = d > 0 ? `D-${d}` : (h > 0 ? `임박 (${h}시간)` : "곧 마감!");
-            statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${text}</div>`;
-        }
+            const delBtn = isEditMode ? `<button onclick="deleteLink('${link}')" style="background: #ff7675; color: white; border: none; border-radius: 8px; padding: 5px 10px; font-size: 10px; cursor: pointer; font-weight: bold;">삭제</button>` : '';
 
-        // [핵심] 편집 모드일 때만 삭제 버튼 생성
-        const deleteBtn = isEditMode ? `<button onclick="deleteLink('${link}')" style="background: #ff7675; color: white; border: none; border-radius: 8px; padding: 5px 10px; font-size: 10px; cursor: pointer; font-weight: bold;">삭제</button>` : '';
-
-        // 카드의 HTML 구조를 하나로 통합 (중복 제거)
-        card.innerHTML = `
-            <div>
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                    <span class="tag ${tagClass}">${isUpcoming ? 'UPCOMING' : (tag || 'INFO')}</span>
-                    ${deleteBtn}
+            card.innerHTML = `
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <span class="tag ${tagClass}">${isUp ? 'UPCOMING' : tag}</span>
+                        ${delBtn}
+                    </div>
+                    <div class="card-title">${title || '공유된 정보'}</div>
+                    ${statusHtml}
                 </div>
-                <div class="card-title">${title || '공유된 정보'}</div>
-                ${statusHtml}
-            </div>
-            <a href="${link}" target="_blank" class="go-btn">${isUpcoming ? '미리보기' : '바로가기'}</a>
-        `;
-        
-        grid.appendChild(card);
-    });
-}
-
+                <a href="${link}" target="_blank" class="go-btn">${isUp ? '미리보기' : '바로가기'}</a>
+            `;
+            grid.appendChild(card);
+        });
+    }
     window.onload = fetchCards;
 </script>
-
 </body>
 </html>
