@@ -231,26 +231,24 @@
     }
 
 async function fetchCards() {
-    // 시트 하단 탭 이름이 정확히 data인지 다시 한번 확인해주세요!
-    const RANGE = 'data!A2:G'; 
-    const fetchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-    
-    try {
-        const response = await fetch(fetchUrl);
-        if (!response.ok) {
-            // 에러 발생 시 콘솔에 더 자세한 내용을 찍어줍니다.
-            const errorDetail = await response.json();
-            console.error("시트 호출 상세 에러:", errorDetail);
-            throw new Error(`HTTP error! status: ${response.status}`);
+        const RANGE = 'data!A2:G'; // 시트 탭 이름이 data인지 다시 확인!
+        // 아래 줄은 반드시 백틱(`)으로 감싸져야 변수들이 인식됩니다.
+        const fetchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+        
+        try {
+            const response = await fetch(fetchUrl);
+            const data = await response.json();
+            
+            if (data.error) {
+                console.error("API 응답 에러 메시지:", data.error.message);
+                return;
+            }
+            
+            cachedRows = data.values || [];
+            renderCards(cachedRows);
+        } catch (e) { 
+            console.error("데이터 로딩 중 최종 에러:", e); 
         }
-        const data = await response.json();
-        cachedRows = data.values || [];
-        renderCards(cachedRows);
-    } catch (e) { 
-        console.error("데이터 로딩 중 최종 오류:", e); 
-        document.getElementById('mainGrid').innerHTML = 
-            '<div style="grid-column: 1/3; text-align: center; color: white;">데이터를 불러오는 중 오류가 발생했습니다. 시트 공유 설정을 확인해주세요.</div>';
-    }
 }
 
     function renderCards(rows) {
