@@ -7,63 +7,156 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        :root { --top: #c5c9f4; --btm: #fbc2eb; --glass: rgba(255,255,255,0.4); --text: #4b4b7c; --accent: #7d93eb; }
-        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, var(--top), var(--btm)); margin: 0; padding: 20px; min-height: 100vh; color: var(--text); background-attachment: fixed; }
-        
+
+        :root { 
+            --top: #2d1b4e; 
+            --btm: #a29bfe; 
+            --glass: rgba(255, 255, 255, 0.12); 
+            --text: #ffffff; 
+            --accent: #ff7675; 
+            --neon-purple: #a29bfe; 
+        }
+
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background: linear-gradient(160deg, var(--top), #6c5ce7, var(--btm)); 
+            margin: 0; padding: 20px; min-height: 100vh; 
+            color: var(--text); 
+            background-attachment: fixed;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            overflow-x: hidden;
+        }
+
+        /* 1. 배경 별빛 애니메이션 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #a29bfe, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 80px 120px, #fff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: stars 100s linear infinite;
+            opacity: 0.3; z-index: -1; pointer-events: none;
+        }
+        @keyframes stars { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
+
+        /* 2. 마우스 별가루 스타일 */
+        .particle {
+            position: fixed; top: 0; left: 0; width: 6px; height: 6px;
+            background: var(--neon-purple); border-radius: 50%;
+            pointer-events: none; z-index: 20000;
+            box-shadow: 0 0 10px var(--neon-purple), 0 0 20px #fff;
+            animation: fadeOut 0.8s ease-out forwards;
+        }
+        @keyframes fadeOut {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            100% { transform: scale(0.2) translateY(50px); opacity: 0; }
+        }
+
+        /* 스크롤바 */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #6c5ce7; border-radius: 10px; border: 2px solid var(--top); }
 
-        .container { width: 100%; max-width: 480px; margin: 0 auto; transition: 0.3s; }
-        header { text-align: center; padding: 20px 0; cursor: pointer; }
-        .logo { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-top: 10px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.3); }
-        .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; }
         
-        .cat-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
-        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .chip.active { background: white; color: var(--accent); }
+        /* 3. 로고 네온 사인 효과 */
+        header { text-align: center; padding: 30px 0; }
+        .logo { 
+            font-size: 32px; font-weight: 900; color: white; letter-spacing: 2px;
+            animation: neon-pulse 2s ease-in-out infinite alternate;
+        }
+        @keyframes neon-pulse {
+            from { text-shadow: 0 0 10px rgba(162, 155, 254, 0.8); }
+            to { text-shadow: 0 0 25px rgba(162, 155, 254, 1), 0 0 10px rgba(255,255,255,0.5); }
+        }
 
-        /* 카드 기본 스타일 */
+        .glass-panel { 
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 30px; padding: 20px; margin-bottom: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-box { 
+            width: 100%; padding: 14px 18px; border-radius: 18px; 
+            border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); 
+            color: white; outline: none; box-sizing: border-box; 
+            margin-bottom: 12px; font-family: inherit; transition: 0.3s; font-size: 14px;
+        }
+        .input-box::placeholder { color: rgba(255,255,255,0.5); }
+        input[type="datetime-local"] { font-size: 11px !important; padding: 10px 5px !important; color-scheme: dark; }
+
+        .chip { 
+            padding: 10px 22px; border-radius: 50px; background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.2); font-size: 14px; font-weight: 700; 
+            cursor: pointer; white-space: nowrap; color: white; transition: 0.4s;
+        }
+        .chip.active { background: white; color: #6c5ce7; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+        /* 4. 카드 슬롯 및 둥둥 떠다니는 애니메이션 */
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; transition: 0.3s; }
-        .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 22px; padding: 12px; border: 1px solid var(--glass); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
-        .card-img { width: 100%; height: 95px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; cursor: pointer; }
-        .card-title { font-size: 13px; font-weight: 800; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
-        .go-btn { width: 100%; background: white; color: var(--text); border: none; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; }
+        .card { 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
+            border-radius: 25px; padding: 15px; border: 1px solid rgba(255,255,255,0.15); 
+            display: flex; flex-direction: column; position: relative;
+            animation: floating 4s ease-in-out infinite;
+            animation-delay: calc(var(--i) * 0.2s);
+        }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-        /* ✨ 팁 탭 전용: 3열 모드 및 슬림 스타일 */
+        .card:hover { 
+            transform: translateY(-15px) scale(1.02) !important; 
+            background: rgba(255,255,255,0.2); border-color: white; 
+            box-shadow: 0 0 25px rgba(162, 155, 254, 0.5); z-index: 5;
+        }
+        .card-img { width: 100%; height: 95px; border-radius: 18px; object-fit: cover; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.1); }
+        .card-title { font-size: 13px; font-weight: 800; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; color: #f1f2f6; }
+        
+        .go-btn { 
+            width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; 
+            padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s;
+        }
+        .go-btn:active { transform: scale(0.95); filter: brightness(1.2); }
+
+        /* 팁 카드 컴팩트 모드 */
         .card-grid.tips-mode { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .card.tip-card { border: 1.5px solid var(--accent) !important; background: rgba(255, 255, 255, 0.9) !important; padding: 8px !important; border-radius: 15px; min-height: auto !important; }
-        .card.tip-card .card-img { height: 55px !important; margin-bottom: 5px; }
-        .card.tip-card .card-title { font-size: 11px !important; height: auto !important; -webkit-line-clamp: 1 !important; text-align: center; color: var(--accent); margin-bottom: 5px; }
-        .card.tip-card .go-btn { padding: 6px !important; font-size: 9px !important; background: var(--accent); color: white; }
+        .card.tip-card { border: 1.5px solid var(--neon-purple) !important; padding: 8px !important; min-height: auto !important; }
+        .card.tip-card .card-img { height: 55px !important; }
+        .card.tip-card .card-title { font-size: 11px !important; height: auto !important; -webkit-line-clamp: 1 !important; color: white; text-align: center; }
+        .card.tip-card .go-btn { background: white; color: #6c5ce7; box-shadow: none; }
 
-        /* 날짜 입력창 최적화 */
-        input[type="datetime-local"] { font-size: 11px !important; padding: 10px 5px !important; letter-spacing: -0.5px; }
+        .tip-link-badge { 
+            position: absolute; top: 10px; right: 10px; background: white; color: #6c5ce7; 
+            padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 900; z-index: 10; 
+        }
 
-        .tip-link-badge { position: absolute; top: 10px; right: 10px; background: rgba(125, 147, 235, 0.9); color: white; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 350px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .fab-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; box-shadow: 0 8px 20px rgba(125,147,235,0.5); z-index: 10001; transition: 0.3s; border: none; }
-        .fab-btn.active { background: #ff7675; transform: rotate(45deg); }
+        #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 320px; }
+        .fab-btn { 
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
+            background: white; color: #6c5ce7; border-radius: 50%; font-size: 35px; border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10001; transition: 0.3s; 
+        }
+        .fab-btn.active { background: var(--accent); color: white; transform: rotate(45deg); }
 
         @media (min-width: 1024px) {
             .container { max-width: 1300px; }
-            #mainLayout { display: flex; gap: 25px; align-items: start; }
+            #mainLayout { display: flex; gap: 25px; }
             #gridContainer { flex: 1; }
-            .sidebar { width: 320px; min-width: 320px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
+            .sidebar { width: 320px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
             .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
             .card-grid.tips-mode { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
         }
-        .thanks-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; z-index: 5000; display: none; }
-        #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
-        #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
     </style>
 </head>
 <body>
 
 <div id="modal" onclick="this.style.display='none'"><img id="modalImg"></div>
-<div id="thanksPopup" class="thanks-popup">소중한 제보 감사해요!</div>
+<div id="thanksPopup" class="thanks-popup">💜 소중한 제보 감사해요! 💜</div>
 <button class="fab-btn" id="fabBtn" onclick="toggleRegPanel()">+</button>
 
 <div class="container">
@@ -71,20 +164,16 @@
 
     <div id="registrationPanel" class="glass-panel">
         <div style="font-weight: 900; margin-bottom: 15px; display: flex; justify-content: space-between;">
-            <span>🗳️ 정보 제보 및 등록</span>
+            <span>🗳️ 정보 등록</span>
             <span onclick="toggleRegPanel()" style="cursor:pointer; opacity:0.5;">✕</span>
         </div>
-
-        <label style="font-size:11px; font-weight:800; color:var(--accent); margin-left:5px;">등록 대상 선택</label>
         <select id="regTargetSheet" class="input-box" onchange="toggleRegFields()">
             <option value="data">🌟 일반 정보 / 투표 등록</option>
             <option value="tips">💡 투표 앱 팁 등록</option>
         </select>
-
         <div id="voteAppArea">
-            <label style="font-size:11px; font-weight:800; margin-left:5px;">투표 앱 선택 (해당 시)</label>
             <select id="regVoteApp" class="input-box">
-                <option value="">없음 (일반 정보)</option>
+                <option value="">투표 앱 선택 (해당 시)</option>
                 <option value="kooky">kooky</option><option value="덕애드">덕애드</option><option value="딩고">딩고</option>
                 <option value="링크/tin">링크/tin</option><option value="마이원픽">마이원픽</option><option value="뮤니버스">뮤니버스</option>
                 <option value="뮤빗">뮤빗</option><option value="벅스">벅스</option><option value="셀럽챔프">셀럽챔프</option>
@@ -95,100 +184,79 @@
                 <option value="피크닠">피크닠</option><option value="하이어">하이어</option><option value="후즈팬">후즈팬</option>
             </select>
         </div>
-
-        <input type="text" id="regImg" class="input-box" placeholder="🖼️ 이미지 주소 (선택)">
+        <input type="text" id="regImg" class="input-box" placeholder="🖼️ 이미지 주소">
         <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소">
         <input type="text" id="regTitle" class="input-box" placeholder="📝 제목">
-        
-        <div id="dateInputArea" style="display: flex; gap: 5px; margin-bottom: 10px;">
-            <div style="flex:1;">
-                <label style="font-size:10px; font-weight:800; color:var(--accent); margin-left:5px;">시작 (월-일)</label>
-                <input type="datetime-local" id="regStart" class="input-box" style="margin-bottom:0;">
-            </div>
-            <div style="flex:1;">
-                <label style="font-size:10px; font-weight:800; color:var(--accent); margin-left:5px;">마감 (월-일)</label>
-                <input type="datetime-local" id="regDeadline" class="input-box" style="margin-bottom:0;">
-            </div>
+        <div id="dateInputArea" style="display: flex; gap: 5px;">
+            <input type="datetime-local" id="regStart" class="input-box">
+            <input type="datetime-local" id="regDeadline" class="input-box">
         </div>
-        
-        <button onclick="submitData()" id="subBtn" class="go-btn" style="background:var(--accent); color:white; padding:15px; border-radius:15px;">등록하기</button>
+        <button onclick="submitData()" id="subBtn" class="go-btn" style="padding:15px; border-radius:18px;">등록하기</button>
     </div>
 
     <input type="text" id="search" class="input-box" placeholder="검색어를 입력하세요..." oninput="renderCards()">
     <div class="cat-group">
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
-        <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 앱 팁</div>
+        <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 팁</div>
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
     </div>
 
     <div id="mainLayout">
         <div id="gridContainer"><div class="card-grid" id="grid"></div></div>
         <div class="sidebar">
-            <div class="glass-panel"><div style="font-weight: 900; margin-bottom: 10px;">📢 NOTICE</div><div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div></div>
-            <div class="glass-panel" style="border: 2px solid var(--accent);">
-                <div style="font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;"><span>🎧 실시간 뮤밍 빌더</span><button onclick="openBuilderModal()" class="chip" style="background:var(--accent); color:white; border:none; padding:4px 10px;">+ 리스트 편집</button></div>
-                <div id="totalTimeDisplay" style="font-size: 11px; color: var(--accent); margin-bottom:10px;">총 0분 0초</div>
+            <div class="glass-panel"><div style="font-weight: 900; margin-bottom: 10px; color: var(--neon-purple);">📢 NOTICE</div><div id="noticeDisplay" style="font-size: 12px; line-height: 1.6;"></div></div>
+            <div class="glass-panel" style="border: 2px solid var(--neon-purple);">
+                <div style="font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between;"><span>🎧 뮤밍 빌더</span><button onclick="openBuilderModal()" class="chip" style="background:white; color:#6c5ce7; border:none; padding:4px 10px; font-size: 11px;">+ 편집</button></div>
+                <div id="totalTimeDisplay" style="font-size: 11px; color: var(--neon-purple); margin-bottom:10px;">총 0분 0초</div>
                 <div id="builderGrid"></div>
-                <div style="margin-top: 10px; display: flex; gap: 5px;"><button onclick="playBuilderList()" class="go-btn" style="background:#555; color:white; flex:1; font-weight:800;">▶ 전체재생</button><button onclick="clearBuilder()" class="go-btn" style="flex:0.4; border:1px solid #ddd;">삭제</button></div>
-            </div>
-            <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;"><span>💬 플리 대기실</span><button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer;">(변경)</button></div>
-                <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
-                <div style="display: flex; gap: 5px;"><input type="text" id="chatInput" class="input-box" style="margin-bottom:0; flex:1;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()"><button onclick="window.sendChat()" class="go-btn" style="flex:0.3; background:var(--accent); color:white; padding:0;">전송</button></div>
+                <div style="margin-top: 10px; display: flex; gap: 5px;"><button onclick="playBuilderList()" class="go-btn" style="flex:1;">▶ 전체재생</button><button onclick="clearBuilder()" class="go-btn" style="flex:0.4; background:rgba(255,255,255,0.2); box-shadow: none;">삭제</button></div>
             </div>
         </div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    const firebaseConfig = { apiKey: "AIzaSyDZQL2iDN220bBdU0xiYDShqLRRp6AQJDI", authDomain: "chat-9035a.firebaseapp.com", databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "chat-9035a", storageBucket: "chat-9035a.firebasestorage.app", messagingSenderId: "807179401789", appId: "1:807179401789:web:644359473a0cb1e05f4854", measurementId: "G-BKQNKVRB8X" };
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const chatRef = ref(db, 'chats');
-    let myNick = localStorage.getItem('chatNickname') || "플리_" + Math.floor(Math.random()*1000);
-    localStorage.setItem('chatNickname', myNick);
-    window.sendChat = function() {
-        const input = document.getElementById('chatInput');
-        if (input.value.trim()) { push(chatRef, { nick: myNick, msg: input.value, time: Date.now() }); input.value = ''; }
-    };
-    onChildAdded(chatRef, (d) => {
-        const c = d.val();
-        const box = document.getElementById('chatMessages');
-        const div = document.createElement('div');
-        div.style.marginBottom = "8px";
-        div.innerHTML = `<span style="color:${c.nick===myNick?'var(--accent)':'#555'}; font-weight:700;">[${c.nick}]</span> ${c.msg}`;
-        box.appendChild(div); box.scrollTop = box.scrollHeight;
-    });
-</script>
-
 <script>
     const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
     const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
-    let cachedData = [], builderData = JSON.parse(localStorage.getItem('plaveBuilder') || '[]');
-    let galleryData = [], tipsData = [], currentSheet = 'data', isAdmin = false;
+    let cachedData = [], tipsData = [], currentSheet = 'data', isAdmin = false;
+
+    // 🆕 마우스/터치 별가루 효과 로직
+    document.addEventListener('mousemove', (e) => createParticle(e.clientX, e.clientY));
+    document.addEventListener('touchmove', (e) => createParticle(e.touches[0].clientX, e.touches[0].clientY));
+
+    function createParticle(x, y) {
+        if (Math.random() > 0.15) return; 
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 6 + 2;
+        p.style.width = p.style.height = `${size}px`;
+        const colors = ['#a29bfe', '#6c5ce7', '#efebff', '#ffffff'];
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = `${x}px`; p.style.top = `${y}px`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+    }
 
     function toggleRegPanel() {
         const p = document.getElementById('registrationPanel');
         const b = document.getElementById('fabBtn');
-        const v = p.style.display === 'block';
-        if (!v) {
+        const isV = p.style.display === 'block';
+        if (!isV) {
             const now = new Date();
             const after3 = new Date(); after3.setDate(now.getDate() + 3);
             document.getElementById('regStart').value = now.toISOString().slice(0, 16);
             document.getElementById('regDeadline').value = after3.toISOString().slice(0, 16);
         }
-        p.style.display = v ? 'none' : 'block';
-        b.classList.toggle('active', !v);
+        p.style.display = isV ? 'none' : 'block';
+        b.classList.toggle('active', !isV);
     }
 
     function toggleRegFields() {
         const target = document.getElementById('regTargetSheet').value;
         document.getElementById('dateInputArea').style.display = target === 'tips' ? 'none' : 'flex';
         document.getElementById('voteAppArea').style.display = target === 'tips' ? 'none' : 'block';
-        document.getElementById('regTitle').placeholder = target === 'tips' ? "📝 앱 이름 (예: 아이돌챔프)" : "📝 제목";
+        document.getElementById('regTitle').placeholder = target === 'tips' ? "📝 앱 이름" : "📝 제목";
     }
 
     async function fetchTipsOnly() {
@@ -208,82 +276,60 @@
         if (currentSheet === 'tips') g.classList.add('tips-mode'); else g.classList.remove('tips-mode');
 
         const displayData = isAdmin ? cachedData : [...cachedData].reverse();
-        displayData.forEach((row) => {
+        displayData.forEach((row, index) => {
             const [date, link, cat, appName, title, start, deadline, img] = row;
             if(q && !title.toLowerCase().includes(q)) return;
             const div = document.createElement('div');
-            const isTip = currentSheet === 'tips';
-            div.className = `card ${isTip ? 'tip-card' : ''}`;
-            let tipBadge = "";
-            if (!isTip && appName && tipsData.find(t => t[4] === appName)) {
-                tipBadge = `<div class="tip-link-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁</div>`;
+            const isT = currentSheet === 'tips';
+            div.className = `card ${isT ? 'tip-card' : ''}`;
+            div.style.setProperty('--i', index); // 애니메이션 엇박자용
+
+            let badge = "";
+            if (!isT && appName && tipsData.find(t => t[4] === appName)) {
+                badge = `<div class="tip-link-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁</div>`;
             }
-            div.innerHTML = `${tipBadge}${isAdmin?'<div class="handle">⠿</div>':''}${img?`<img src="${img}" class="card-img" onclick="showImg('${img}')">`:''}<div class="card-title">${title}</div><button class="go-btn" onclick="window.open('${link}','_blank')">${isTip?'보기':'이동'}</button>`;
+            div.innerHTML = `${badge}${img?`<img src="${img}" class="card-img" onclick="showImg('${img}')">`:''}<div class="card-title">${title}</div><button class="go-btn" onclick="window.open('${link}','_blank')">${isT?'보기':'이동'}</button>`;
             g.appendChild(div);
         });
     }
 
     async function submitData() {
-        const targetSheet = document.getElementById('regTargetSheet').value;
+        const target = document.getElementById('regTargetSheet').value;
         const btn = document.getElementById('subBtn');
         const payload = { 
-            sheetName: targetSheet,
+            sheetName: target,
             url: document.getElementById('regLink').value.trim(), 
             userTitle: document.getElementById('regTitle').value.trim(), 
-            tag: targetSheet === 'data' ? document.getElementById('regVoteApp').value : "", 
-            start: targetSheet === 'data' ? document.getElementById('regStart').value : "", 
-            deadline: targetSheet === 'data' ? document.getElementById('regDeadline').value : "",
+            tag: target === 'data' ? document.getElementById('regVoteApp').value : "", 
+            start: target === 'data' ? document.getElementById('regStart').value : "", 
+            deadline: target === 'data' ? document.getElementById('regDeadline').value : "",
             img: document.getElementById('regImg').value.trim()
         };
-
-        if (!payload.url || !payload.userTitle) return alert("주소와 제목을 입력해주세요!");
+        if (!payload.url || !payload.userTitle) return alert("입력 확인!");
         btn.innerText = "등록 중..."; btn.disabled = true;
-
         try {
             const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
             const result = await res.json();
             if(result.result === "success") { 
-                const p = document.getElementById('thanksPopup'); p.style.display='block'; setTimeout(()=>p.style.display='none', 2000);
-                document.getElementById('regLink').value = ''; document.getElementById('regTitle').value = ''; document.getElementById('regImg').value = '';
+                document.getElementById('thanksPopup').style.display='block'; setTimeout(()=>document.getElementById('thanksPopup').style.display='none', 2000);
                 toggleRegPanel(); fetchData(); await fetchTipsOnly();
             }
-        } catch (e) { alert("오류 발생"); } finally { btn.innerText = "등록하기"; btn.disabled = false; }
+        } catch (e) { alert("실패"); } finally { btn.innerText = "등록하기"; btn.disabled = false; }
     }
 
     function setCat(chip, s) { 
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         if(chip) chip.classList.add('active'); 
-        else { const target = document.querySelector(`.chip[onclick*="'${s}'"]`); if(target) target.classList.add('active'); }
         currentSheet = s; fetchData(); 
     }
 
-    // --- 나머지 함수들(빌더 관련 등) 기존 코드 유지 ---
-    function saveAndRender() {
-        localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
-        const grid = document.getElementById('builderGrid'); grid.innerHTML = '';
-        builderData.forEach((item, idx) => {
-            const div = document.createElement('div'); div.className = 'builder-item';
-            div.innerHTML = `<div class="v-drag-handle">⠿</div><div style="flex:1; cursor:pointer;" onclick="playSingleTrack('${item.url}')"><div style="font-weight:800;">${item.title}</div><div style="font-size:10px; color:var(--accent);">🎧 클릭시 덮어씌워 재생</div></div><button onclick="removeFromBuilder(${idx})" style="border:none; background:none; color:red;">×</button>`;
-            grid.appendChild(div);
-        });
-        document.getElementById('totalTimeDisplay').innerText = `총 ${Math.floor(builderData.length*210/60)}분 ${builderData.length*210%60}초`;
-    }
-    function playSingleTrack(url) { window.open(url, "plavePlayer", "width=1000,height=700"); }
-    function playBuilderList() {
-        const ids = builderData.map(i => { const m = i.url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|\/v\/|embed\/))([^?&"'>]+)/); return m ? m[1] : null; }).filter(id => id);
-        if(ids.length) window.open(`https://www.youtube.com/watch_videos?video_ids=${ids.join(',')}`, "plavePlayer", "width=1000,height=700");
-    }
-    function openBuilderModal() { document.getElementById('builderModal').style.display='flex'; renderGallery(); }
-    function closeBuilderModal() { document.getElementById('builderModal').style.display='none'; }
-    function removeFromBuilder(i) { builderData.splice(i,1); saveAndRender(); }
-    function clearBuilder() { if(confirm("비울까요?")) { builderData=[]; saveAndRender(); } }
     function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
     function askAdmin() { if(prompt("비번?")==="0312") { isAdmin=true; fetchData(); } }
     async function loadNotice() {
         const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/notice!A:A?key=${API_KEY}`).then(res => res.json());
         document.getElementById('noticeDisplay').innerHTML = (r.values || []).map(n => `• ${n[0]}<br>`).join('');
     }
-    window.onload = async () => { await fetchTipsOnly(); fetchData(); loadNotice(); saveAndRender(); };
+    window.onload = async () => { await fetchTipsOnly(); fetchData(); loadNotice(); };
 </script>
 </body>
 </html>
