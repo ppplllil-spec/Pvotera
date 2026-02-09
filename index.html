@@ -81,13 +81,8 @@
         </div>
 
         <div style="margin-bottom: 15px;">
-            <div style="font-size: 11px; font-weight: 800; margin-bottom: 8px; opacity: 0.8;">⚡️ 퀵 등록 (누르면 바로 담겨요)</div>
-            <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px;">
-                <button class="chip" onclick="quickAdd('BBUU! MV', 'https://youtu.be/8L001YT4k6k?si=I5BjQjPytOn2dpEc', 3, 45)">뿌우</button>
-                <button class="chip" onclick="quickAdd('Way 4 Luv', 'https://youtu.be/FxB6_qaqHlY?si=gHDovq0O0aSJquTU', 3, 12)">웨이포럽</button>
-                <button class="chip" onclick="quickAdd('Pump Up The Volume!', 'https://youtu.be/EYG4ROejmyI?si=Nu78eMGJPH-2Yu2_', 3, 30)">푸티비</button>
-                <button class="chip" onclick="quickAdd('일반 영상(환기)', 'https://youtu.be/NNf9QhWjG58?si=6Ix4bTDQbSvsYCns', 5, 0)"> 사마죄</button>
-            </div>
+            <div style="font-size: 11px; font-weight: 800; margin-bottom: 8px; opacity: 0.8;">⚡️ 퀵 등록 (라디오 시트 기반)</div>
+            <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px;"></div>
         </div>
 
         <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
@@ -199,7 +194,6 @@
         });
     }
 
-    // 전용 창 재생 제어
     function openPlayer(url) {
         window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes");
     }
@@ -230,7 +224,6 @@
         if((await res.json()).result === "success") { alert("등록 완료!"); location.reload(); }
     }
 
-    // 퀵 등록 (중복 버그 수정 완료)
     function quickAdd(title, url, min, sec) {
         builderData.push({ title, url, min, sec, id: Date.now() });
         saveAndRender();
@@ -246,11 +239,37 @@
         const sec = parseInt(document.getElementById('vSec').value || 0);
         if(!title || !url) return alert("제목과 링크를 입력해주세요!");
         
-        quickAdd(title, url, min, sec);
+        quickAdd(title, url, min, sec); // 여기서 한 번만 추가됨
         document.getElementById('vTitle').value = '';
         document.getElementById('vUrl').value = '';
         document.getElementById('vMin').value = '';
         document.getElementById('vSec').value = '';
+    }
+
+    async function loadQuickMenuFromRadio() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
+        try {
+            const r = await fetch(url).then(res => res.json());
+            const radioData = r.values || [];
+            const btnContainer = document.getElementById('quickBtns');
+            btnContainer.innerHTML = ''; 
+
+            radioData.forEach(row => {
+                const title = row[4], link = row[10], timeInfo = row[13];
+                if (title && link) {
+                    let min = 0, sec = 0;
+                    if (timeInfo) {
+                        const timeMatch = timeInfo.match(/(\d+):(\d+)/) || timeInfo.match(/(\d+)분\s*(\d+)초/);
+                        if (timeMatch) { min = parseInt(timeMatch[1]); sec = parseInt(timeMatch[2]); }
+                    }
+                    const ytLink = link.split(/[\s,]+/).find(l => l.includes('youtu')) || link.split(/[\s,]+/)[0];
+                    const btn = document.createElement('button');
+                    btn.className = 'chip'; btn.innerHTML = `🔥 ${title}`;
+                    btn.onclick = () => quickAdd(title, ytLink, min, sec);
+                    btnContainer.appendChild(btn);
+                }
+            });
+        } catch (e) { console.error("퀵 메뉴 로드 실패:", e); }
     }
 
     function saveAndRender() {
@@ -280,7 +299,7 @@
     function playBuilderList() {
         if(builderData.length === 0) return alert("리스트를 먼저 구성해주세요!");
         openPlayer(builderData[0].url);
-        alert("첫 번째 영상을 전용 창에서 열었습니다! 완료 후 다음 영상을 클릭하세요.");
+        alert("첫 번째 영상을 전용 창에서 열었습니다!");
     }
 
     function removeFromBuilder(idx) { builderData.splice(idx, 1); saveAndRender(); }
@@ -289,7 +308,7 @@
     function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
     function setCat(b, s) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); currentSheet=s; fetchData(); }
 
-    window.onload = () => { fetchData(); saveAndRender(); };
+    window.onload = () => { fetchData(); loadQuickMenuFromRadio(); saveAndRender(); };
     Sortable.create(document.getElementById('grid'), { handle: '.handle', animation: 150 });
     Sortable.create(document.getElementById('builderGrid'), {
         animation: 150, handle: '.v-drag-handle',
