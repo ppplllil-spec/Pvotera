@@ -2,165 +2,142 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>플레이브 라디오 화력지원</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>라디오 신청 - PL-TUB-RA</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        :root {
-            --bg-radio: #dee2ff; --accent-purple: #7d93eb;
-            --glass: rgba(255, 255, 255, 0.6); --text: #4b4b7c;
-        }
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background: linear-gradient(135deg, #dee2ff 0%, #efd5ff 100%);
-            margin: 0; padding: 20px; color: var(--text); min-height: 100vh;
-        }
-        .container { width: 100%; max-width: 500px; margin: 0 auto; }
-        header { text-align: center; padding: 20px 0; position: relative; }
-        .logo { font-size: 24px; font-weight: 900; color: #5a5a9e; }
+        :root { --top: #ffdde1; --btm: #ee9ca7; --glass: rgba(255,255,255,0.4); --text: #7d5a5a; --accent: #ee9ca7; }
+        body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, var(--top), var(--btm)); margin: 0; padding: 20px; min-height: 100vh; color: var(--text); background-attachment: fixed; }
         
-        .home-btn {
-            position: absolute; top: 25px; left: 0;
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 12px; border-radius: 15px;
-            text-decoration: none; font-size: 12px; font-weight: 800;
-            color: var(--text); backdrop-filter: blur(10px); transition: 0.3s;
-        }
-        .home-btn:hover { background: white; transform: translateX(-3px); }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; }
+        header { text-align: center; padding: 20px 0; cursor: pointer; }
+        .logo { font-size: 24px; font-weight: 900; color: white; }
 
-        .preset-section {
-            background: var(--glass); backdrop-filter: blur(10px);
-            border-radius: 25px; padding: 20px; margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3);
-        }
-        .preset-title { font-size: 14px; font-weight: 800; margin-bottom: 15px; display: block; }
-        .song-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-        .chip {
-            padding: 8px 15px; border-radius: 15px; background: white; border: 1px solid #ddd;
-            font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
-        }
-        .chip.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.3); }
+        .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
         
-        .link-options { display: flex; gap: 15px; font-size: 13px; font-weight: 700; }
+        .admin-only { display: none; }
+        .handle { cursor: grab; background: rgba(0,0,0,0.05); text-align: center; border-radius: 8px; font-size: 10px; padding: 4px; margin-bottom: 8px; display: none; }
+
+        .card { background: rgba(255,255,255,0.6); border-radius: 22px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass); }
+        .card-title { font-size: 15px; font-weight: 800; margin-bottom: 5px; }
+        .card-info { font-size: 12px; opacity: 0.8; margin-bottom: 12px; }
         
-        .radio-grid { display: flex; flex-direction: column; gap: 12px; }
-        .radio-card {
-            background: white; border-radius: 20px; padding: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .radio-info { display: flex; flex-direction: column; gap: 4px; }
-        .radio-name { font-size: 15px; font-weight: 800; }
-        .radio-station { font-size: 11px; color: #888; font-weight: 600; }
+        .copy-btn { width: 100%; background: white; color: var(--text); border: none; padding: 12px; border-radius: 15px; font-weight: 800; cursor: pointer; margin-bottom: 8px; font-size: 13px; }
+        .go-btn { display: block; width: 100%; background: var(--accent); color: white; text-align: center; text-decoration: none; padding: 12px; border-radius: 15px; font-weight: 800; font-size: 13px; box-sizing: border-box; }
         
-        .copy-go-btn {
-            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
-            border: none; padding: 10px 18px; border-radius: 12px;
-            color: white; font-weight: 800; font-size: 12px; cursor: pointer;
-        }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <a href="../index.html" class="home-btn">🏠 메인</a>
-        <div class="logo">📻 RADIO SUPPORT</div>
-    </header>
+    <a href="../index.html" class="back-btn">⇠ 돌아가기</a>
+    <header onclick="askAdmin()"><div class="logo">RADIO STATION</div></header>
 
-    <div class="preset-section">
-        <span class="preset-title">🎵 신청곡 및 링크 설정</span>
-        <div class="song-chips" id="songChips">
-            <div class="chip active" onclick="selectSong('bbuu', this)">BBUU! (X-mas)</div>
-            <div class="chip" onclick="selectSong('way4luv', this)">Way 4 Luv</div>
-            <div class="chip" onclick="selectSong('pump_up', this)">Pump Up!</div>
-        </div>
-        <div class="link-options">
-            <label><input type="checkbox" id="checkSpot" checked> 스포티파이 포함</label>
-            <label><input type="checkbox" id="checkYt" checked> 유튜브 MV 포함</label>
-        </div>
+    <div id="adminPanel" class="glass-panel admin-only">
+        <input type="text" id="regTitle" class="input-box" placeholder="📻 방송 프로그램 제목">
+        <input type="text" id="regLink" class="input-box" placeholder="🔗 신청 폼/게시판 링크">
+        <input type="text" id="regDj" class="input-box" placeholder="👤 DJ태그 (예: @plave_official)">
+        <input type="text" id="regHash" class="input-box" placeholder="# 해시태그 (예: #노아의초콜릿박스)">
+        <select id="regStation" class="input-box">
+            <option value="W">W (유튜브/위버스)</option>
+            <option value="M">M (MBC 라디오)</option>
+        </select>
+        <button onclick="submitRadio()" id="subBtn" class="go-btn" style="width:100%; border:none;">라디오 등록하기</button>
+        <button onclick="saveOrder()" class="copy-btn" style="margin-top:10px;">↕ 순서 저장하기</button>
     </div>
 
-    <div class="radio-grid" id="radioGrid">
-        <div style="text-align: center; padding: 40px; color: #888;">데이터를 불러오고 있습니다...</div>
-    </div>
+    <div id="grid"></div>
 </div>
 
 <script>
-    const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
-    const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
+    const API_KEY = "수희님의_API_KEY";
+    const SHEET_ID = "수희님의_SHEET_ID";
+    const GAS_URL = "수희님의_GAS_배포_URL";
     
-    // 🎵 곡별 고정 프리셋 데이터 (유튜브 공식채널 & 스포티파이)
-    const SONG_PRESETS = {
-        "bbuu": { title: "BBUU! (Christmas Version)", sp: "https://open.spotify.com/artist/0k2zyzGq6HX383VlMBOvRG", yt: "https://youtu.be/HSO6D4F-ljw" },
-        "way4luv": { title: "Way 4 Luv", sp: "https://open.spotify.com/track/way4luv", yt: "https://youtu.be/..." },
-        "pump_up": { title: "Pump Up The Volume!", sp: "https://open.spotify.com/track/pump", yt: "https://youtu.be/..." }
-    };
+    let cachedData = [], isAdmin = false;
 
-    let currentSongKey = "bbuu";
-    let cachedRadio = [];
-
-    function selectSong(key, btn) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        currentSongKey = key;
-    }
-
-    async function fetchRadio() {
-        const RANGE = 'radio!A2:L'; 
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-        try {
-            const res = await fetch(url).then(r => r.json());
-            cachedRadio = res.values || [];
-            renderRadio();
-        } catch (e) { console.error(e); }
-    }
-
-    // 📋 방송국별 사연 자동 생성 및 복사 함수
-    function copyAndGo(link, stationCode, dj, hash) {
-        const song = SONG_PRESETS[currentSongKey];
-        const links = [];
-        if(document.getElementById('checkSpot').checked) links.push(`Spotify: ${song.sp}`);
-        if(document.getElementById('checkYt').checked) links.push(`YouTube: ${song.yt}`);
-        const linkStr = links.join('\n');
-
-        let msg = "";
-        
-        if (stationCode === 'WPVR') {
-            msg = `Hi. DJ ${dj}\nI'd like to request ${song.title} by #PLAVE\nThank you so much.\n\n${hash}\n${linkStr}`;
-        } else if (['KBS', 'SBS', 'MBC'].includes(stationCode)) {
-            msg = `[${stationCode}] 플레이브의 ${song.title} 신청합니다! 멤버들의 매력적인 목소리로 이 곡 꼭 들려주세요. 항상 응원합니다! 💙💜💗❤️🖤\n\n${linkStr}`;
-        } else {
-            msg = `I want to hear ${song.title} by PLAVE. Please play it! ✨\n\n${linkStr}`;
+    function askAdmin() {
+        if(prompt("관리자 비밀번호를 입력하세요.") === "0312") {
+            isAdmin = true;
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            renderCards();
         }
-
-        navigator.clipboard.writeText(msg).then(() => {
-            alert("라디오 맞춤 신청문구가 복사되었습니다! ✨\n게시판 이동 후 바로 붙여넣기 하세요.");
-            window.open(link, '_blank');
-        });
     }
 
-    function renderRadio() {
-        const grid = document.getElementById('radioGrid');
-        grid.innerHTML = '';
+    async function fetchData() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:M?key=${API_KEY}`;
+        try {
+            const r = await fetch(url).then(res => res.json());
+            cachedData = r.values || [];
+            renderCards();
+        } catch(e) { console.error("라디오 로드 실패"); }
+    }
 
-        cachedRadio.reverse().forEach(row => {
-            const [date, link, cat, tag, title, start, end, img, dj, hash, extra, stationCode] = row;
-            const card = document.createElement('div');
-            card.className = 'radio-card';
-            
-            card.innerHTML = `
-                <div class="radio-info">
-                    <span class="radio-station">${stationCode || 'RADIO'}</span>
-                    <span class="radio-name">${title}</span>
-                </div>
-                <button class="copy-go-btn" onclick="copyAndGo('${link}', '${stationCode}', '${dj}', '${hash}')">복사 & 이동</button>
+    function renderCards() {
+        const g = document.getElementById('grid'); g.innerHTML = '';
+        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
+
+        displayData.forEach((row, idx) => {
+            const [date, link, cat, tag, title, start, deadline, img, dj, hash, song, station] = row;
+            const realIdx = isAdmin ? idx : cachedData.length - 1 - idx;
+
+            const c = document.createElement('div');
+            c.className = 'card';
+            c.setAttribute('data-idx', realIdx);
+            c.innerHTML = `
+                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 드래그하여 이동</div>` : ''}
+                <div class="card-title">${title}</div>
+                <div class="card-info">${dj || ''} ${hash || ''}</div>
+                <button class="copy-btn" onclick="copyText('${dj}','${hash}','${station}')">📋 사연 문구 복사</button>
+                <a href="${link}" target="_blank" class="go-btn">신청하러 가기</a>
             `;
-            grid.appendChild(card);
+            g.appendChild(c);
         });
     }
 
-    window.onload = fetchRadio;
+    // 문구 복사 로직 (DJ태그 + 해시태그 조합)
+    function copyText(dj, hash, station) {
+        let ment = "";
+        if(station === 'M') {
+            ment = `[사연신청] ${dj} ${hash} 오늘도 좋은 노래 들려주세요!`;
+        } else {
+            ment = `${dj} ${hash} 플레이브 노래 신청합니다! 💙💜💗❤️🖤`;
+        }
+        
+        navigator.clipboard.writeText(ment).then(() => {
+            alert("문구가 복사되었습니다! ✨\n\n" + ment);
+        });
+    }
+
+    async function saveOrder() {
+        const cards = document.querySelectorAll('.card');
+        const newOrderedData = Array.from(cards).map(c => cachedData[c.getAttribute('data-idx')]);
+        const res = await fetch(GAS_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "updateOrder", sheetName: "radio", orderedData: newOrderedData }) 
+        });
+        if((await res.json()).result === "success") alert("라디오 순서 저장 완료!");
+    }
+
+    async function submitRadio() {
+        const payload = {
+            sheetName: "radio",
+            url: document.getElementById('regLink').value,
+            userTitle: document.getElementById('regTitle').value,
+            djTag: document.getElementById('regDj').value,
+            hashtags: document.getElementById('regHash').value,
+            stationCode: document.getElementById('regStation').value,
+            category: "라디오", tag: "RADIO"
+        };
+        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+        if((await res.json()).result === "success") { alert("라디오 등록 완료!"); location.reload(); }
+    }
+
+    window.onload = fetchData;
+    Sortable.create(document.getElementById('grid'), { handle: '.handle', animation: 150 });
 </script>
 </body>
 </html>
