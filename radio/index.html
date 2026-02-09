@@ -3,106 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>라디오 신청</title>
+    <title>PL-TUB-RA | 라디오 신청</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        :root { --top: #ffdde1; --btm: #ee9ca7; --glass: rgba(255,255,255,0.4); --text: #7d5a5a; --accent: #ee9ca7; }
+        :root { --top: #c5c9f4; --btm: #fbc2eb; --glass: rgba(255,255,255,0.4); --text: #4b4b7c; --accent: #7d93eb; }
         body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, var(--top), var(--btm)); margin: 0; padding: 20px; min-height: 100vh; color: var(--text); background-attachment: fixed; }
         
-        .container { width: 100%; max-width: 480px; margin: 0 auto; }
+        /* 스크롤바 디자인 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .container { width: 100%; max-width: 480px; margin: 0 auto; transition: 0.3s; }
         header { text-align: center; padding: 20px 0; cursor: pointer; }
-        .logo { font-size: 24px; font-weight: 900; color: white; }
+        .logo { font-size: 24px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; opacity: 0.8; }
 
         .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.3); }
         .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
         
         .admin-only { display: none; }
-        .handle { cursor: grab; background: rgba(0,0,0,0.05); text-align: center; border-radius: 8px; font-size: 10px; padding: 4px; margin-bottom: 8px; display: none; }
 
-        .card { background: rgba(255,255,255,0.6); border-radius: 22px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass); }
-        .card-title { font-size: 15px; font-weight: 800; margin-bottom: 5px; }
-        .card-info { font-size: 12px; opacity: 0.8; margin-bottom: 12px; }
+        /* 앨범/태그 그룹화 스타일 */
+        .album-group { background: rgba(255,255,255,0.15); border-radius: 25px; padding: 15px; margin-bottom: 25px; }
+        .album-title { font-size: 17px; font-weight: 900; margin-bottom: 15px; color: white; padding-left: 10px; border-left: 4px solid var(--accent); }
         
-        .copy-btn { width: 100%; background: white; color: var(--text); border: none; padding: 12px; border-radius: 15px; font-weight: 800; cursor: pointer; margin-bottom: 8px; font-size: 13px; }
-        .go-btn { display: block; width: 100%; background: var(--accent); color: white; text-align: center; text-decoration: none; padding: 12px; border-radius: 15px; font-weight: 800; font-size: 13px; box-sizing: border-box; }
-        
-        .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; }
-        /* ✨ 전체 레이아웃 (PC) */
-@media (min-width: 1024px) {
-    .container {
-        max-width: 1200px;
-        display: grid;
-        grid-template-columns: 1fr 320px; /* 메인 1 : 사이드바 320px */
-        gap: 30px;
-        align-items: start;
-    }
-}
+        /* 라디오 카드 가로형 컴팩트 디자인 */
+        .radio-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .radio-card { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.6); padding: 12px 18px; border-radius: 18px; border: 1px solid var(--glass); }
+        .radio-info { flex: 1; }
+        .radio-title { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+        .radio-tags { font-size: 11px; opacity: 0.6; }
+        .radio-btns { display: flex; gap: 6px; }
+        .copy-btn, .go-link { padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; text-decoration: none; border: none; }
+        .copy-btn { background: white; color: var(--text); }
+        .go-link { background: var(--accent); color: white; }
 
-/* ✨ 라디오 앨범별 그룹 스타일 */
-.album-group {
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 15px;
-    margin-bottom: 25px;
-}
-.album-title {
-    font-size: 16px;
-    font-weight: 900;
-    margin-bottom: 12px;
-    padding-left: 10px;
-    border-left: 4px solid var(--accent);
-}
-.radio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 한 줄에 여러 개 */
-    gap: 10px;
-}
-
-/* ✨ 사이드바 (공지 & 채팅) */
-.sidebar {
-    position: sticky;
-    top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.chat-box {
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-}
-#chatMessages {
-    flex: 1;
-    overflow-y: auto;
-    font-size: 13px;
-    padding: 10px;
-    background: rgba(255,255,255,0.5);
-    border-radius: 10px;
-}
-        
+        /* PC 레이아웃 (1024px 이상) */
+        @media (min-width: 1024px) {
+            .container { max-width: 1200px; }
+            #mainLayout { display: flex; gap: 25px; align-items: start; }
+            #gridContainer { flex: 1; }
+            .sidebar { width: 320px; position: sticky; top: 20px; }
+            .radio-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <a href="../index.html" class="back-btn">⇠ 돌아가기</a>
+    <a href="../index.html" class="back-btn">⇠ 메인으로 돌아가기</a>
     <header onclick="askAdmin()"><div class="logo">RADIO STATION</div></header>
 
     <div id="adminPanel" class="glass-panel admin-only">
         <input type="text" id="regTitle" class="input-box" placeholder="📻 방송 프로그램 제목">
         <input type="text" id="regLink" class="input-box" placeholder="🔗 신청 폼/게시판 링크">
-        <input type="text" id="regDj" class="input-box" placeholder="👤 DJ태그 (예: @plave_official)">
-        <input type="text" id="regHash" class="input-box" placeholder="# 해시태그 (예: #노아의초콜릿박스)">
+        <input type="text" id="regTagCode" class="input-box" placeholder="🏷️ 태그코드 (D열 - 묶음기준)">
+        <input type="text" id="regDj" class="input-box" placeholder="👤 DJ 인사말/태그">
+        <input type="text" id="regHash" class="input-box" placeholder="# 해시태그">
+        <input type="text" id="regExtra" class="input-box" placeholder="🔗 스포티파이, 유튜브 링크">
         <select id="regStation" class="input-box">
-            <option value="W">W (유튜브/위버스)</option>
-            <option value="M">M (MBC 라디오)</option>
+            <option value="HALLYU">HALLYU (영어/스포티파이)</option>
+            <option value="TOCA">TOCA (포르투갈어)</option>
+            <option value="GV">GV (DJ Clyde)</option>
+            <option value="URBANA">URBANA (스페인어)</option>
+            <option value="WPVR">WPVR (DJ Kevin)</option>
+            <option value="M">M (국내 MBC 등)</option>
         </select>
-        <button onclick="submitRadio()" id="subBtn" class="go-btn" style="width:100%; border:none;">라디오 등록하기</button>
-        <button onclick="saveOrder()" class="copy-btn" style="margin-top:10px;">↕ 순서 저장하기</button>
+        <button onclick="submitRadio()" class="go-link" style="width:100%; padding:15px; font-size:14px; border:none;">라디오 등록하기</button>
     </div>
 
-    <div id="grid"></div>
+    <div id="mainLayout">
+        <div id="gridContainer">
+            <div id="grid"></div>
+        </div>
+
+        <div class="sidebar">
+            <div class="glass-panel">
+                <div style="font-weight: 900; margin-bottom: 10px;">📢 RADIO NOTICE</div>
+                <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;">
+                    공지사항을 불러오는 중...
+                </div>
+            </div>
+            <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
+                <div style="font-weight: 900; margin-bottom: 10px;">💬 플리 대기실</div>
+                <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
+                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) sendChat()">
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -121,111 +110,95 @@
     }
 
     async function fetchData() {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:M?key=${API_KEY}`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
         try {
             const r = await fetch(url).then(res => res.json());
             cachedData = r.values || [];
             renderCards();
-        } catch(e) { console.error("라디오 로드 실패"); }
+        } catch(e) { console.error("데이터 로드 실패"); }
     }
 
-function renderCards() {
-    const g = document.getElementById('grid'); g.innerHTML = '';
-    const groups = {};
+    function renderCards() {
+        const g = document.getElementById('grid'); g.innerHTML = '';
+        const groups = {};
 
-    // 1. D열(태그코드) 기준으로 데이터를 그룹화
-    cachedData.forEach((row, idx) => {
-        const tagCode = row[3] || "ETC"; // D열: 태그코드
-        if (!groups[tagCode]) groups[tagCode] = [];
-        groups[tagCode].push({ row, idx });
-    });
+        // D열(태그코드) 기준으로 그룹화
+        cachedData.forEach((row, idx) => {
+            const tagCode = row[3] || "ETC"; 
+            if (!groups[tagCode]) groups[tagCode] = [];
+            groups[tagCode].push({ row, idx });
+        });
 
-    // 2. 그룹별로 화면에 그리기
-    for (const code in groups) {
-        const groupDiv = document.createElement('div');
-        groupDiv.className = 'album-group';
-        // 태그코드에 따라 아이콘이나 이름을 예쁘게 표시
-        const groupName = code === 'VOTE' ? '🗳️ 투표 진행중' : (code === 'STREAM' ? '🎧 뮤밍 리스트' : `✨ ${code}`);
-        groupDiv.innerHTML = `<div class="album-title">${groupName}</div>`;
-        
-        const cardGrid = document.createElement('div');
-        cardGrid.className = 'radio-grid'; // PC에서 가로 배치를 위한 그리드 클래스
-        
-        groups[code].forEach(item => {
-            const [date, link, cat, tag, title, start, deadline, img, dj, hash, extra, station] = item.row;
+        for (const code in groups) {
+            const albumDiv = document.createElement('div');
+            albumDiv.className = 'album-group';
+            albumDiv.innerHTML = `<div class="album-title">💿 ${code}</div>`;
             
-            const card = document.createElement('div');
-            card.className = 'radio-card'; 
-            card.innerHTML = `
-                <div class="radio-info">
-                    <div class="radio-title">${title}</div>
-                    <div style="font-size:10px; color:#ff7675; font-weight:700;">${deadline ? '⏰ 마감: ' + deadline : ''}</div>
-                </div>
-                <div class="radio-btns">
-                    ${dj ? `<button class="copy-btn" onclick="copyText('${dj}','${hash}','${station}','${title}','${extra}')">📋</button>` : ''}
-                    <a href="${link}" target="_blank" class="go-btn">▶</a>
-                </div>
-            `;
-            cardGrid.appendChild(card);
-        });
-        groupDiv.appendChild(cardGrid);
-        g.appendChild(groupDiv);
+            const radioGrid = document.createElement('div');
+            radioGrid.className = 'radio-grid';
+            
+            groups[code].forEach(item => {
+                const [date, link, cat, tag, title, start, deadline, img, dj, hash, extra, station] = item.row;
+                const card = document.createElement('div');
+                card.className = 'radio-card';
+                card.innerHTML = `
+                    <div class="radio-info">
+                        <div class="radio-title">${title}</div>
+                        <div class="radio-tags">${dj || ''}</div>
+                    </div>
+                    <div class="radio-btns">
+                        <button class="copy-btn" onclick="copyText('${dj}','${hash}','${station}','${title}','${extra}')">📋</button>
+                        <a href="${link}" target="_blank" class="go-link">▶</a>
+                    </div>
+                `;
+                radioGrid.appendChild(card);
+            });
+            albumDiv.appendChild(radioGrid);
+            g.appendChild(albumDiv);
+        }
     }
-}
 
-function copyText(dj, hash, station, title, extraLinks) {
-    let ment = "";
-    
-    // 링크 분리 (K열에 스포티파이, 유튜브 순으로 적었다고 가정)
-    const links = extraLinks ? extraLinks.split(/[\s,]+/) : ["", ""];
-    const spotify = links[0] || "";
-    const youtube = links[1] || "";
-    const allLinks = links.filter(l => l !== "").join('\n');
+    function copyText(dj, hash, station, title, extraLinks) {
+        let ment = "";
+        const links = extraLinks ? extraLinks.split(/[\s,]+/) : ["", ""];
+        const spotify = links[0] || "";
+        const youtube = links[1] || "";
+        const allLinks = links.filter(l => l !== "").join('\n');
 
-    // [L열] 방송국 코드에 따른 멘트 분기
-    switch (station) {
-        case 'HALLYU': // @HALLYUIL (영어 양식)
-            ment = `Hi. ${dj}\n\nI would like to request ${title} by #PLAVE\nThank you so much.\n\n${spotify}`;
-            break;
-
-        case 'TOCA': // TOCA NA STAR (포르투갈어 양식)
-            ment = `Olá.\nGostaria de solicitar a música ${title} da #PLAVE.\nMuito obrigado.\n\n${hash}\n\n${spotify}\n${youtube}`;
-            break;
-
-        case 'GV': // GV 99.1 (DJ Clyde 영어 양식)
-            ment = `Hi, DJ Clyde!\nI'd like to request ${title} by #PLAVE.\nThank you so much.\n\n${hash}\n\n${allLinks}`;
-            break;
-
-        case 'URBANA': // La Urbana (스페인어 양식)
-            ment = `Buenos días a todos ${dj} este sábado me encantaría escuchar ${title} de PLAVE ${hash}`;
-            break;
-
-        case 'WPVR': // WPVR Kevin DJ (기존 양식)
-            ment = `Hi. DJ Kevin. ${dj}\nI'd like to request ${title} by #PLAVE\nThank you so much.\n\n${hash}\n\n${allLinks}`;
-            break;
-
-        case 'M': // 국내 MBC/KBS 등
-            ment = `[사연신청] ${dj} ${hash} 플레이브의 ${title} 신청합니다! 오늘도 좋은 노래 부탁드려요. 💙💜💗❤️🖤\n\n${allLinks}`;
-            break;
-
-        default: // 기타 일반 양식
-            ment = `${dj} ${hash}\nI request ${title} by PLAVE. Thank you!\n\n${allLinks}`;
-    }
-    
-    // 클립보드 복사 실행
-    navigator.clipboard.writeText(ment).then(() => {
-        alert(`${station} 맞춤 사연이 복사되었습니다! ✨\n\n` + ment);
-    });
-}
-    
-    async function saveOrder() {
-        const cards = document.querySelectorAll('.card');
-        const newOrderedData = Array.from(cards).map(c => cachedData[c.getAttribute('data-idx')]);
-        const res = await fetch(GAS_URL, { 
-            method: "POST", 
-            body: JSON.stringify({ action: "updateOrder", sheetName: "radio", orderedData: newOrderedData }) 
+        switch (station) {
+            case 'HALLYU': ment = `Hi. ${dj}\n\nI would like to request ${title} by #PLAVE\nThank you so much.\n\n${spotify}`; break;
+            case 'TOCA': ment = `Olá.\nGostaria de solicitar a música ${title} da #PLAVE.\nMuito obrigado.\n\n${hash}\n\n${spotify}\n${youtube}`; break;
+            case 'GV': ment = `Hi, DJ Clyde!\nI'd like to request ${title} by #PLAVE.\nThank you so much.\n\n${hash}\n\n${allLinks}`; break;
+            case 'URBANA': ment = `Buenos días a todos ${dj} este sábado me encantaría escuchar ${title} de PLAVE ${hash}`; break;
+            case 'WPVR': ment = `Hi. DJ Kevin. ${dj}\nI'd like to request ${title} by #PLAVE\nThank you so much.\n\n${hash}\n\n${allLinks}`; break;
+            case 'M': ment = `[사연신청] ${dj} ${hash} 플레이브의 ${title} 신청합니다! 오늘도 좋은 노래 부탁드려요. 💙💜💗❤️🖤\n\n${allLinks}`; break;
+            default: ment = `${dj} ${hash}\nI request ${title} by PLAVE. Thank you!\n\n${allLinks}`;
+        }
+        
+        navigator.clipboard.writeText(ment).then(() => {
+            alert(`${station} 사연 복사 완료! ✨`);
         });
-        if((await res.json()).result === "success") alert("라디오 순서 저장 완료!");
+    }
+
+    async function loadNotice() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/notice!A:A?key=${API_KEY}`;
+        try {
+            const r = await fetch(url).then(res => res.json());
+            const notices = r.values || [];
+            document.getElementById('noticeDisplay').innerHTML = notices.map(n => `• ${n[0]}<br>`).join('');
+        } catch(e) { document.getElementById('noticeDisplay').innerText = "공지가 없습니다."; }
+    }
+
+    function sendChat() {
+        const input = document.getElementById('chatInput');
+        if (!input.value.trim()) return;
+        const chatBox = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.style.marginBottom = "5px";
+        div.innerHTML = `<b>익명플리:</b> ${input.value}`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        input.value = '';
     }
 
     async function submitRadio() {
@@ -233,17 +206,18 @@ function copyText(dj, hash, station, title, extraLinks) {
             sheetName: "radio",
             url: document.getElementById('regLink').value,
             userTitle: document.getElementById('regTitle').value,
+            tag: document.getElementById('regTagCode').value,
             djTag: document.getElementById('regDj').value,
             hashtags: document.getElementById('regHash').value,
+            extraLinks: document.getElementById('regExtra').value,
             stationCode: document.getElementById('regStation').value,
-            category: "라디오", tag: "RADIO"
+            category: "라디오"
         };
         const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
         if((await res.json()).result === "success") { alert("라디오 등록 완료!"); location.reload(); }
     }
 
-    window.onload = fetchData;
-    Sortable.create(document.getElementById('grid'), { handle: '.handle', animation: 150 });
+    window.onload = () => { fetchData(); loadNotice(); };
 </script>
 </body>
 </html>
