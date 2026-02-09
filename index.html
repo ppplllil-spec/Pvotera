@@ -238,15 +238,16 @@
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     // ⚠️ Firebase 설정값을 여기에 정확히 붙여넣으세요!
-    const firebaseConfig = {
-        apiKey: "...",
-        authDomain: "...",
-        databaseURL: "...",
-        projectId: "...",
-        storageBucket: "...",
-        messagingSenderId: "...",
-        appId: "..."
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDZQL2iDN220bBdU0xiYDShqLRRp6AQJDI",
+  authDomain: "chat-9035a.firebaseapp.com",
+  databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "chat-9035a",
+  storageBucket: "chat-9035a.firebasestorage.app",
+  messagingSenderId: "807179401789",
+  appId: "1:807179401789:web:644359473a0cb1e05f4854",
+  measurementId: "G-BKQNKVRB8X"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
