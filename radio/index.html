@@ -102,18 +102,6 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "",
-        authDomain: "chat-9035a.firebaseapp.com",
-        databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "chat-9035a",
-        storageBucket: "chat-9035a.firebasestorage.app",
-        messagingSenderId: "807179401789",
-        appId: "1:807179401789:web:644359473a0cb1e05f4854",
-        measurementId: "G-BKQNKVRB8X"
-    };
-
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const chatRef = ref(db, 'chats');
