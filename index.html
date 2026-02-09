@@ -10,27 +10,18 @@
         :root { --top: #c5c9f4; --btm: #fbc2eb; --glass: rgba(255,255,255,0.4); --text: #4b4b7c; --accent: #7d93eb; }
         body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, var(--top), var(--btm)); margin: 0; padding: 20px; min-height: 100vh; color: var(--text); background-attachment: fixed; }
         
-        /* 리셋 알림 바 */
         #alertBar { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(125,147,235,0.9); color: white; padding: 10px 30px; border-radius: 30px; font-weight: 900; z-index: 3000; transition: 0.5s; backdrop-filter: blur(10px); }
         #alertBar.show { top: 30px; }
-
         .container { width: 100%; max-width: 480px; margin: 0 auto; }
         header { text-align: center; padding: 20px 0; position: relative; cursor: pointer; }
         .logo { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        /* 입력창 및 검색창 */
         .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.3); }
         .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
         .search-box { background: var(--glass); margin-bottom: 20px; }
-
         .admin-only { display: none; }
-        
-        /* 카테고리 칩 */
         .cat-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
         .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .chip.active { background: white; color: var(--accent); }
-
-        /* 카드 그리드 */
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 22px; padding: 12px; border: 1px solid var(--glass); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
         .card.done { opacity: 0.5; filter: grayscale(0.8); }
@@ -38,15 +29,18 @@
         .card-img { width: 100%; height: 95px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; cursor: pointer; }
         .card-title { font-size: 13px; font-weight: 800; line-height: 1.3; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .timer { font-size: 10px; font-weight: 900; color: #ff7675; margin: 8px 0; }
-        
         .btn-row { display: flex; gap: 5px; margin-top: auto; }
         .go-btn, .check-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; }
         .go-btn { background: white; color: var(--text); }
         .check-btn { background: var(--accent); color: white; }
-
-        /* 모달 (이미지 크게보기) */
         #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
         #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
+        .builder-item { background: white; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass); cursor: grab; margin-bottom: 8px; }
+        .v-drag-handle { color: #ccc; font-size: 14px; }
+        .v-info { flex: 1; }
+        .v-name { font-size: 13px; font-weight: 800; }
+        .v-time-tag { font-size: 11px; color: var(--accent); font-weight: 700; }
+        .v-del { background: none; border: none; color: #ff7675; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -79,6 +73,40 @@
     </div>
 
     <div class="card-grid" id="grid"></div>
+
+    <div class="glass-panel" style="margin-top: 40px; border: 2px solid var(--accent);">
+        <div style="font-weight: 900; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center;">
+            <span>🎧 나만의 실시간 뮤밍 빌더</span>
+            <div id="totalTimeDisplay" style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 12px;">총 0분 0초</div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <div style="font-size: 11px; font-weight: 800; margin-bottom: 8px; opacity: 0.8;">⚡️ 퀵 등록 (누르면 바로 담겨요)</div>
+            <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 5px;">
+                <button class="chip" onclick="quickAdd('BBUUI! MV', 'https://youtu.be/HSO6D4F-ljw', 3, 45)">🔥 뿌이</button>
+                <button class="chip" onclick="quickAdd('Way 4 Luv', 'https://youtu.be/fM_VnupP6v4', 3, 12)">💙 웨이포럽</button>
+                <button class="chip" onclick="quickAdd('Pump Up!', 'https://youtu.be/fM_VnupP6v4', 3, 30)">💜 펌업</button>
+                <button class="chip" onclick="quickAdd('일반 영상(환기)', 'https://youtu.be/링크', 5, 0)">🎥 일반영상</button>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 15px; margin-bottom: 15px;">
+            <input type="text" id="vTitle" class="input-box" placeholder="영상 제목 직접 입력">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="vUrl" class="input-box" style="flex: 2;" placeholder="유튜브 링크">
+                <input type="number" id="vMin" class="input-box" style="flex: 0.7;" placeholder="분">
+                <input type="number" id="vSec" class="input-box" style="flex: 0.7;" placeholder="초">
+                <button onclick="addToBuilder()" class="check-btn" style="flex: 0.8; height: 42px; margin-bottom: 10px;">담기</button>
+            </div>
+        </div>
+
+        <div id="builderGrid" style="display: flex; flex-direction: column; gap: 8px; min-height: 50px;"></div>
+
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555;">▶ 전체 순서대로 재생</button>
+            <button onclick="clearBuilder()" class="go-btn" style="flex: 0.4; border: 1px solid #ddd;">전체 삭제</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -87,8 +115,8 @@
     const GAS_URL = "수희님의_GAS_배포_URL";
     
     let currentSheet = 'data', cachedData = [], isAdmin = false, tempWebP = "";
+    let builderData = JSON.parse(localStorage.getItem('plaveBuilder') || '[]');
 
-    // 1. 관리자 인증 (비번 0312)
     function askAdmin() {
         if(prompt("관리자 비밀번호를 입력하세요.") === "0312") {
             isAdmin = true;
@@ -97,7 +125,6 @@
         }
     }
 
-    // 2. 리셋 알림
     setInterval(() => {
         const n = new Date();
         if(n.getMinutes() === 0 && n.getSeconds() === 0) {
@@ -107,7 +134,6 @@
         }
     }, 1000);
 
-    // 3. WebP 변환
     async function processWebP(input) {
         if(!input.files[0]) return;
         const file = input.files[0];
@@ -122,7 +148,6 @@
         };
     }
 
-    // 4. 데이터 페치
     async function fetchData() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`;
         try {
@@ -132,13 +157,10 @@
         } catch(e) { console.error("데이터 로드 실패"); }
     }
 
-    // 5. 카드 렌더링
     function renderCards() {
         const q = document.getElementById('search').value.toLowerCase();
         const g = document.getElementById('grid'); g.innerHTML = '';
         const now = new Date();
-
-        // 관리자가 아닐 때만 역순(최신순), 관리자 모드에선 시트 순서 그대로(드래그용)
         const displayData = isAdmin ? cachedData : [...cachedData].reverse();
 
         displayData.forEach((row, idx) => {
@@ -163,20 +185,25 @@
             c.className = `card ${isDone ? 'done' : ''}`;
             c.setAttribute('data-idx', isAdmin ? idx : cachedData.length - 1 - idx);
             c.innerHTML = `
-                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 드래그하여 이동</div>` : ''}
+                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 이동</div>` : ''}
                 ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
                 <div class="card-title">${title}</div>
                 ${timerHtml}
                 <div class="btn-row">
-                    <a href="${link}" target="_blank" class="go-btn">이동</a>
+                    <button class="go-btn" onclick="openPlayer('${link}')">이동</button>
                     <button class="check-btn" onclick="toggleChk('${id}', this)">${isDone?'완료 ✅':'체크'}</button>
                 </div>
+                ${isAdmin ? `<button onclick="editItem(${idx})" style="font-size:10px; margin-top:5px; border:none; background:none; color:#999; cursor:pointer;">✏️ 수정</button>` : ''}
             `;
             g.appendChild(c);
         });
     }
 
-    // 6. 드래그 앤 드롭 저장
+    // 전용 창 재생 제어
+    function openPlayer(url) {
+        window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes");
+    }
+
     async function saveOrder() {
         const cards = document.querySelectorAll('.card');
         const newOrderedData = Array.from(cards).map(c => cachedData[c.getAttribute('data-idx')]);
@@ -184,10 +211,9 @@
             method: "POST", 
             body: JSON.stringify({ action: "updateOrder", sheetName: currentSheet, orderedData: newOrderedData }) 
         });
-        if((await res.json()).result === "success") alert("순서 저장 완료! ✨");
+        if((await res.json()).result === "success") alert("순서 저장 완료!");
     }
 
-    // 7. 신규 등록
     async function submitData() {
         const btn = document.getElementById('subBtn');
         const payload = {
@@ -204,20 +230,79 @@
         if((await res.json()).result === "success") { alert("등록 완료!"); location.reload(); }
     }
 
-    // 기타 유틸
-    function toggleChk(id, b) { 
-        const card = b.closest('.card'); card.classList.toggle('done');
-        const done = card.classList.contains('done'); localStorage.setItem(id, done);
-        b.innerText = done ? '완료 ✅' : '체크'; 
+    // 퀵 등록 (중복 버그 수정 완료)
+    function quickAdd(title, url, min, sec) {
+        builderData.push({ title, url, min, sec, id: Date.now() });
+        saveAndRender();
+        const total = document.getElementById('totalTimeDisplay');
+        total.style.transform = 'scale(1.2)';
+        setTimeout(() => total.style.transform = 'scale(1)', 200);
     }
+
+    function addToBuilder() {
+        const title = document.getElementById('vTitle').value;
+        const url = document.getElementById('vUrl').value;
+        const min = parseInt(document.getElementById('vMin').value || 0);
+        const sec = parseInt(document.getElementById('vSec').value || 0);
+        if(!title || !url) return alert("제목과 링크를 입력해주세요!");
+        
+        quickAdd(title, url, min, sec);
+        document.getElementById('vTitle').value = '';
+        document.getElementById('vUrl').value = '';
+        document.getElementById('vMin').value = '';
+        document.getElementById('vSec').value = '';
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
+        const grid = document.getElementById('builderGrid');
+        grid.innerHTML = '';
+        let totalSec = 0;
+        builderData.forEach((item, index) => {
+            totalSec += (item.min * 60) + item.sec;
+            const div = document.createElement('div');
+            div.className = 'builder-item';
+            div.setAttribute('data-id', item.id);
+            div.innerHTML = `
+                <div class="v-drag-handle">⠿</div>
+                <div class="v-info">
+                    <div class="v-name">${item.title}</div>
+                    <div class="v-time-tag">${item.min}분 ${item.sec}초</div>
+                </div>
+                <button class="v-del" onclick="removeFromBuilder(${index})">×</button>
+            `;
+            grid.appendChild(div);
+        });
+        const h = Math.floor(totalSec / 3600), m = Math.floor((totalSec % 3600) / 60), s = totalSec % 60;
+        document.getElementById('totalTimeDisplay').innerText = `총 ${h > 0 ? h+'시간 ' : ''}${m}분 ${s}초`;
+    }
+
+    function playBuilderList() {
+        if(builderData.length === 0) return alert("리스트를 먼저 구성해주세요!");
+        openPlayer(builderData[0].url);
+        alert("첫 번째 영상을 전용 창에서 열었습니다! 완료 후 다음 영상을 클릭하세요.");
+    }
+
+    function removeFromBuilder(idx) { builderData.splice(idx, 1); saveAndRender(); }
+    function clearBuilder() { if(confirm("비울까요?")) { builderData = []; saveAndRender(); } }
+    function toggleChk(id, b) { const card = b.closest('.card'); card.classList.toggle('done'); localStorage.setItem(id, card.classList.contains('done')); b.innerText = card.classList.contains('done') ? '완료 ✅' : '체크'; }
     function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
     function setCat(b, s) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); currentSheet=s; fetchData(); }
 
-    window.onload = fetchData;
-    setInterval(renderCards, 1000);
-
-    // 드래그 라이브러리 활성화
-    Sortable.create(grid, { handle: '.handle', animation: 150 });
+    window.onload = () => { fetchData(); saveAndRender(); };
+    Sortable.create(document.getElementById('grid'), { handle: '.handle', animation: 150 });
+    Sortable.create(document.getElementById('builderGrid'), {
+        animation: 150, handle: '.v-drag-handle',
+        onEnd: function() {
+            const newOrder = [];
+            document.querySelectorAll('.builder-item').forEach(el => {
+                const item = builderData.find(d => d.id == el.getAttribute('data-id'));
+                if(item) newOrder.push(item);
+            });
+            builderData = newOrder;
+            saveAndRender();
+        }
+    });
 </script>
 </body>
 </html>
