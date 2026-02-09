@@ -39,7 +39,34 @@
 
         /* 팁 연동 배지 */
         .tip-link-badge { position: absolute; top: 10px; right: 10px; background: rgba(125, 147, 235, 0.9); color: white; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+/* ✨ 투표 팁 카드 슬림 & 컴팩트 스타일 */
+.card.tip-card {
+    border: 1.5px solid var(--accent) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 4px 10px rgba(125, 147, 235, 0.1);
+    padding: 10px !important; /* 안쪽 여백 줄임 */
+    min-height: auto !important; /* 높이 고정 해제 */
+}
 
+/* 팁 카드에서는 이미지를 아주 작게 하거나 가로형으로 배치 */
+.card.tip-card .card-img {
+    height: 60px !important; /* 이미지 높이 확 줄임 */
+    margin-bottom: 5px;
+}
+
+.card.tip-card .card-title {
+    font-size: 12px !important;
+    height: auto !important; /* 제목 높이 제한 해제 */
+    -webkit-line-clamp: 1 !important; /* 제목을 한 줄만 표시 */
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.card.tip-card .go-btn {
+    padding: 6px !important; /* 버튼도 슬림하게 */
+    font-size: 10px !important;
+    border-radius: 8px !important;
+}
         /* 플로팅 제보 패널 */
         #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 350px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
