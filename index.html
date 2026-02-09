@@ -128,8 +128,9 @@
             </div>
         </div>
 
-        <div class="cat-group">
-            <button class="chip active" onclick="setCat(this, 'INFO', '정보/광고')">📢 정보</button>
+<div class="cat-group">
+            <button class="chip active" onclick="setCat(this, 'ALL', '전체보기')">🌟 전체</button>
+            <button class="chip" onclick="setCat(this, 'INFO', '정보/광고')">📢 정보</button>
             <button class="chip" onclick="setCat(this, 'VOTE', '투표')">🗳️ 투표</button>
             <button class="chip" onclick="setCat(this, 'RADIO', '라디오')">📻 라디오</button>
         </div>
@@ -231,19 +232,17 @@
     }
 
 async function fetchCards() {
-        const RANGE = 'data!A2:G'; // 시트 탭 이름이 data인지 다시 확인!
+        const RANGE = 'data!A2:H'; // 시트 탭 이름이 data인지 다시 확인!
         // 아래 줄은 반드시 백틱(`)으로 감싸져야 변수들이 인식됩니다.
         const fetchUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
         
         try {
             const response = await fetch(fetchUrl);
             const data = await response.json();
-            
             if (data.error) {
                 console.error("API 응답 에러 메시지:", data.error.message);
                 return;
             }
-            
             cachedRows = data.values || [];
             renderCards(cachedRows);
         } catch (e) { 
@@ -251,31 +250,47 @@ async function fetchCards() {
         }
 }
 
-    function renderCards(rows) {
+function renderCards(rows) {
         const grid = document.getElementById('mainGrid');
         grid.innerHTML = ''; const now = new Date();
         if (!rows || rows.length === 0) { grid.innerHTML = '<div style="grid-column: 1/3; text-align: center; color: white;">데이터가 없습니다.</div>'; return; }
 
         const filtered = rows.filter(r => {
-            if (!r || !r[1] || r[3] !== selectedTag) return false;
+            if (!r || !r[1]) return false;
             if (r[6] && new Date(r[6]) < now) return false;
-            return true;
+
+            // 🌟 전체보기 로직: RADIO 태그 제외
+            if (selectedTag === 'ALL') return r[3] !== 'RADIO';
+            
+            // 투표 탭 로직: VOTE로 시작하는 모든 태그 포함
+            if (selectedTag === 'VOTE') return r[3].startsWith('VOTE');
+
+            return r[3] === selectedTag;
         });
 
         if (filtered.length === 0) { grid.innerHTML = `<div style="grid-column: 1/3; text-align: center; color: white; padding: 40px 0;">활성화된 '${selectedName}' 정보가 없습니다.</div>`; return; }
 
         filtered.reverse().forEach(row => {
-            const [date, link, category, tag, title, startTime, deadline] = row;
+            const [date, link, category, tag, title, startTime, deadline, tipImgUrl] = row;
             const card = document.createElement('div'); card.className = 'card';
-            const s = startTime ? new Date(startTime) : null, e = deadline ? new Date(deadline) : null;
-            let isUp = s && s > now, tagClass = isUp ? 'tag-upcoming' : (tag === 'VOTE' ? 'tag-vote' : 'tag-info'), statusHtml = '';
+            if (tipImgUrl) card.onclick = () => card.classList.toggle('show-tip');
 
+            const s = startTime ? new Date(startTime) : null, e = deadline ? new Date(deadline) : null;
+            let isUp = s && s > now, tagClass = 'tag-info', displayTag = tag;
+
+            // 🌟 태그 디자인 세분화
             if (isUp) {
-                statusHtml = `<div class="status-text" style="color: #7d93eb;">🗓️ 오픈: ${s.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})}</div>`;
-                card.style.opacity = "0.8";
-            } else if (e) {
-                const diff = e - now; const d = Math.floor(diff / (1000 * 60 * 60 * 24)); const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                statusHtml = `<div class="status-text" style="color: #ff4d4d;">⏰ ${d > 0 ? 'D-'+d : (h > 0 ? h+'시간 전' : '곧 마감!')}</div>`;
+                tagClass = 'tag-upcoming'; displayTag = 'UPCOMING';
+            } else if (e && (e - now < 86400000)) {
+                tagClass = 'tag-urgent'; displayTag = '🔥 오늘마감';
+            } else if (tag === 'VOTE_DAILY') {
+                tagClass = 'tag-daily'; displayTag = '✅ 매일필수';
+            } else if (tag === 'VOTE_LAST') {
+                tagClass = 'tag-last'; displayTag = '⏳ 마판용';
+            } else if (tag === 'VOTE') {
+                tagClass = 'tag-vote'; displayTag = 'VOTE';
+            } else if (tag === 'RADIO') {
+                displayTag = '📻 RADIO';
             }
 
             const delBtn = isEditMode ? `<button onclick="deleteLink('${link}')" style="background: #ff7675; color: white; border: none; border-radius: 8px; padding: 5px 10px; font-size: 10px; cursor: pointer; font-weight: bold;">삭제</button>` : '';
@@ -283,18 +298,18 @@ async function fetchCards() {
             card.innerHTML = `
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                        <span class="tag ${tagClass}">${isUp ? 'UPCOMING' : tag}</span>
+                        <span class="tag ${tagClass}">${displayTag}</span>
                         ${delBtn}
                     </div>
                     <div class="card-title">${title || '공유된 정보'}</div>
-                    ${statusHtml}
+                    ${e ? `<div class="status-text" style="color: #ff4d4d;">⏰ ${e.toLocaleString([], {month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit'})} 마감</div>` : ''}
+                    ${tipImgUrl ? `<img src="${tipImgUrl}" class="tip-image">` : ''}
                 </div>
-                <a href="${link}" target="_blank" class="go-btn">${isUp ? '미리보기' : '바로가기'}</a>
+                <a href="${link}" target="_blank" class="go-btn" onclick="event.stopPropagation();">${isUp ? '오픈대기' : '바로가기'}</a>
             `;
             grid.appendChild(card);
         });
     }
-    window.onload = fetchCards;
 </script>
 </body>
 </html>
