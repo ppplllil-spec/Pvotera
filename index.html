@@ -286,24 +286,56 @@
         document.getElementById('noticeDisplay').innerHTML = notices.map(n => `• ${n[0]}<br>`).join('');
     }
 
+// 1. 퀵 메뉴 로드 시 유튜브 링크만 필터링 (공백 및 타 링크 제외)
     async function loadQuickMenuFromRadio() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
-        const r = await fetch(url).then(res => res.json());
-        const radioData = r.values || [];
-        const btnContainer = document.getElementById('quickBtns'); btnContainer.innerHTML = ''; 
-        radioData.forEach(row => {
-            const btn = document.createElement('button'); btn.className = 'chip'; btn.innerHTML = `🔥 ${row[4]}`;
-            btn.onclick = () => quickAdd(row[4], row[10]);
-            btnContainer.appendChild(btn);
-        });
+        try {
+            const r = await fetch(url).then(res => res.json());
+            const radioData = r.values || [];
+            const btnContainer = document.getElementById('quickBtns'); 
+            btnContainer.innerHTML = ''; 
+
+            radioData.forEach(row => {
+                const title = row[4]; // 제목
+                const link = row[10]; // 링크 열 (라디오 시트 기준 11번째 열)
+
+                // 링크가 존재하고, 공백이 아니며, 유튜브 주소를 포함하고 있을 때만 버튼 생성
+                if (link && link.trim() !== "" && link.includes('youtu')) {
+                    const btn = document.createElement('button'); 
+                    btn.className = 'chip'; 
+                    btn.innerHTML = `🔥 ${title}`;
+                    
+                    // 첫 번째로 발견되는 유튜브 링크 추출 (공백이나 쉼표로 구분된 경우 대비)
+                    const validLink = link.split(/[\s,]+/).find(l => l.includes('youtu'));
+                    
+                    btn.onclick = () => quickAdd(title, validLink);
+                    btnContainer.appendChild(btn);
+                }
+            });
+        } catch (e) { 
+            console.error("퀵 메뉴 로드 실패:", e); 
+        }
     }
 
+    // 2. 빌더 추가 시 유효성 검사 강화
     function quickAdd(title, url) {
-        if (!url || !url.includes('youtu')) return alert("유튜브 링크가 아닙니다!");
-        builderData.push({ title, url, min:3, sec:30, id: Date.now() });
+        // 주소가 없거나 공백이거나 유튜브 링크가 아니면 실행 안 함
+        if (!url || url.trim() === "" || !url.includes('youtu')) {
+            alert("유튜브 링크가 포함되지 않은 항목입니다.");
+            return;
+        }
+        
+        // 정상적인 경우에만 빌더 데이터에 추가
+        builderData.push({ 
+            title: title, 
+            url: url.trim(), 
+            min: 3, 
+            sec: 30, 
+            id: Date.now() 
+        });
         saveAndRender();
     }
-
+    
     function saveAndRender() {
         localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
         const grid = document.getElementById('builderGrid'); grid.innerHTML = '';
