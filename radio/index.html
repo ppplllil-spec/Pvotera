@@ -28,6 +28,59 @@
         .go-btn { display: block; width: 100%; background: var(--accent); color: white; text-align: center; text-decoration: none; padding: 12px; border-radius: 15px; font-weight: 800; font-size: 13px; box-sizing: border-box; }
         
         .back-btn { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; font-weight: bold; font-size: 14px; }
+        /* ✨ 전체 레이아웃 (PC) */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        display: grid;
+        grid-template-columns: 1fr 320px; /* 메인 1 : 사이드바 320px */
+        gap: 30px;
+        align-items: start;
+    }
+}
+
+/* ✨ 라디오 앨범별 그룹 스타일 */
+.album-group {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 25px;
+}
+.album-title {
+    font-size: 16px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 4px solid var(--accent);
+}
+.radio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 한 줄에 여러 개 */
+    gap: 10px;
+}
+
+/* ✨ 사이드바 (공지 & 채팅) */
+.sidebar {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.chat-box {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+#chatMessages {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 13px;
+    padding: 10px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+}
+        
     </style>
 </head>
 <body>
@@ -76,27 +129,49 @@
         } catch(e) { console.error("라디오 로드 실패"); }
     }
 
-    function renderCards() {
-        const g = document.getElementById('grid'); g.innerHTML = '';
-        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
+function renderCards() {
+    const g = document.getElementById('grid'); g.innerHTML = '';
+    const groups = {};
 
-        displayData.forEach((row, idx) => {
-            const [date, link, cat, tag, title, start, deadline, img, dj, hash, song, station] = row;
-            const realIdx = isAdmin ? idx : cachedData.length - 1 - idx;
+    // 1. D열(태그코드) 기준으로 데이터를 그룹화
+    cachedData.forEach((row, idx) => {
+        const tagCode = row[3] || "ETC"; // D열: 태그코드
+        if (!groups[tagCode]) groups[tagCode] = [];
+        groups[tagCode].push({ row, idx });
+    });
 
-            const c = document.createElement('div');
-            c.className = 'card';
-            c.setAttribute('data-idx', realIdx);
-            c.innerHTML = `
-                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 드래그하여 이동</div>` : ''}
-                <div class="card-title">${title}</div>
-                <div class="card-info">${dj || ''} ${hash || ''}</div>
-                <button class="copy-btn" onclick="copyText('${dj}','${hash}','${station}')">📋 사연 문구 복사</button>
-                <a href="${link}" target="_blank" class="go-btn">신청하러 가기</a>
+    // 2. 그룹별로 화면에 그리기
+    for (const code in groups) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'album-group';
+        // 태그코드에 따라 아이콘이나 이름을 예쁘게 표시
+        const groupName = code === 'VOTE' ? '🗳️ 투표 진행중' : (code === 'STREAM' ? '🎧 뮤밍 리스트' : `✨ ${code}`);
+        groupDiv.innerHTML = `<div class="album-title">${groupName}</div>`;
+        
+        const cardGrid = document.createElement('div');
+        cardGrid.className = 'radio-grid'; // PC에서 가로 배치를 위한 그리드 클래스
+        
+        groups[code].forEach(item => {
+            const [date, link, cat, tag, title, start, deadline, img, dj, hash, extra, station] = item.row;
+            
+            const card = document.createElement('div');
+            card.className = 'radio-card'; 
+            card.innerHTML = `
+                <div class="radio-info">
+                    <div class="radio-title">${title}</div>
+                    <div style="font-size:10px; color:#ff7675; font-weight:700;">${deadline ? '⏰ 마감: ' + deadline : ''}</div>
+                </div>
+                <div class="radio-btns">
+                    ${dj ? `<button class="copy-btn" onclick="copyText('${dj}','${hash}','${station}','${title}','${extra}')">📋</button>` : ''}
+                    <a href="${link}" target="_blank" class="go-btn">▶</a>
+                </div>
             `;
-            g.appendChild(c);
+            cardGrid.appendChild(card);
         });
+        groupDiv.appendChild(cardGrid);
+        g.appendChild(groupDiv);
     }
+}
 
 function copyText(dj, hash, station, title, extraLinks) {
     let ment = "";
