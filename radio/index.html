@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PL-TUB-RA | 라디오 신청</title>
+    <title>라디오 신청</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -86,28 +86,86 @@
                 </div>
             </div>
             <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 10px;">💬 플리 대기실</div>
+                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                    <span>💬 플리 대기실</span>
+                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer;">(변경)</button>
+                </div>
                 <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
-                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) sendChat()">
+                <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
             </div>
         </div>
     </div>
 </div>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDZQL2iDN220bBdU0xiYDShqLRRp6AQJDI",
+        authDomain: "chat-9035a.firebaseapp.com",
+        databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "chat-9035a",
+        storageBucket: "chat-9035a.firebasestorage.app",
+        messagingSenderId: "807179401789",
+        appId: "1:807179401789:web:644359473a0cb1e05f4854",
+        measurementId: "G-BKQNKVRB8X"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const chatRef = ref(db, 'chats');
+
+    let myNick = localStorage.getItem('chatNickname');
+    if (!myNick) {
+        myNick = prompt("사용하실 닉네임을 입력해주세요!", "익명플리");
+        if (!myNick || myNick.trim() === "") myNick = "익명플리";
+        myNick = myNick.substring(0, 8);
+        localStorage.setItem('chatNickname', myNick);
+    }
+
+    window.changeNick = function() {
+        const newNick = prompt("새로운 닉네임을 입력하세요.");
+        if (newNick && newNick.trim() !== "") {
+            localStorage.setItem('chatNickname', newNick.substring(0, 8));
+            location.reload();
+        }
+    };
+
+    window.sendChat = function() {
+        const input = document.getElementById('chatInput');
+        const msg = input.value.trim();
+        if (!msg) return;
+        push(chatRef, {
+            nick: myNick,
+            msg: msg,
+            time: Date.now()
+        });
+        input.value = '';
+    };
+
+    onChildAdded(chatRef, (data) => {
+        const chat = data.val();
+        const chatMessages = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.style.marginBottom = "8px";
+        div.style.fontSize = "13px";
+        
+        const isMe = chat.nick === myNick;
+        const nickColor = isMe ? "var(--accent)" : "#555";
+        const nickFont = isMe ? "900" : "700";
+
+        div.innerHTML = `<span style="color:${nickColor}; font-weight:${nickFont};">[${chat.nick}]</span> ${chat.msg}`;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+</script>
+
 <script>
     const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
     const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
-    const firebaseConfig = {
-  apiKey: "AIzaSyDZQL2iDN220bBdU0xiYDShqLRRp6AQJDI",
-  authDomain: "chat-9035a.firebaseapp.com",
-  databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "chat-9035a",
-  storageBucket: "chat-9035a.firebasestorage.app",
-  messagingSenderId: "807179401789",
-  appId: "1:807179401789:web:644359473a0cb1e05f4854",
-  measurementId: "G-BKQNKVRB8X"
-};
+    
     let cachedData = [], isAdmin = false;
 
     function askAdmin() {
@@ -130,8 +188,6 @@
     function renderCards() {
         const g = document.getElementById('grid'); g.innerHTML = '';
         const groups = {};
-
-        // D열(태그코드) 기준으로 그룹화
         cachedData.forEach((row, idx) => {
             const tagCode = row[3] || "ETC"; 
             if (!groups[tagCode]) groups[tagCode] = [];
@@ -142,10 +198,8 @@
             const albumDiv = document.createElement('div');
             albumDiv.className = 'album-group';
             albumDiv.innerHTML = `<div class="album-title">💿 ${code}</div>`;
-            
             const radioGrid = document.createElement('div');
             radioGrid.className = 'radio-grid';
-            
             groups[code].forEach(item => {
                 const [date, link, cat, tag, title, start, deadline, img, dj, hash, extra, station] = item.row;
                 const card = document.createElement('div');
@@ -173,7 +227,6 @@
         const spotify = links[0] || "";
         const youtube = links[1] || "";
         const allLinks = links.filter(l => l !== "").join('\n');
-
         switch (station) {
             case 'HALLYU': ment = `Hi. ${dj}\n\nI would like to request ${title} by #PLAVE\nThank you so much.\n\n${spotify}`; break;
             case 'TOCA': ment = `Olá.\nGostaria de solicitar a música ${title} da #PLAVE.\nMuito obrigado.\n\n${hash}\n\n${spotify}\n${youtube}`; break;
@@ -183,10 +236,7 @@
             case 'M': ment = `[사연신청] ${dj} ${hash} 플레이브의 ${title} 신청합니다! 오늘도 좋은 노래 부탁드려요. 💙💜💗❤️🖤\n\n${allLinks}`; break;
             default: ment = `${dj} ${hash}\nI request ${title} by PLAVE. Thank you!\n\n${allLinks}`;
         }
-        
-        navigator.clipboard.writeText(ment).then(() => {
-            alert(`${station} 사연 복사 완료! ✨`);
-        });
+        navigator.clipboard.writeText(ment).then(() => { alert(`${station} 사연 복사 완료! ✨`); });
     }
 
     async function loadNotice() {
@@ -196,18 +246,6 @@
             const notices = r.values || [];
             document.getElementById('noticeDisplay').innerHTML = notices.map(n => `• ${n[0]}<br>`).join('');
         } catch(e) { document.getElementById('noticeDisplay').innerText = "공지가 없습니다."; }
-    }
-
-    function sendChat() {
-        const input = document.getElementById('chatInput');
-        if (!input.value.trim()) return;
-        const chatBox = document.getElementById('chatMessages');
-        const div = document.createElement('div');
-        div.style.marginBottom = "5px";
-        div.innerHTML = `<b>익명플리:</b> ${input.value}`;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        input.value = '';
     }
 
     async function submitRadio() {
