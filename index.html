@@ -70,15 +70,40 @@
         /* 감사 팝업 */
         .thanks-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 5000; display: none; }
 
-        /* PC 레이아웃 (1024px 이상) */
-        @media (min-width: 1024px) {
-            .container { max-width: 1400px; }
-            #mainLayout { display: flex; gap: 30px; align-items: start; }
-            #gridContainer { flex: 1; max-width: 50%; }
-            .sidebar { width: 50%; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 20px; }
-            .card-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
-            #builderGrid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
-        }
+/* ✨ PC 레이아웃 최적화: 진짜 사이드바 스타일 (가로폭 고정) */
+@media (min-width: 1024px) {
+    .container { 
+        max-width: 1300px; /* 전체 너비 살짝 조정 */
+    }
+    #mainLayout { 
+        display: flex; 
+        gap: 25px; 
+        align-items: start; 
+        justify-content: center;
+    }
+    #gridContainer { 
+        flex: 1; /* 사이드바를 제외한 나머지 공간을 전부 사용 */
+    }
+    .sidebar { 
+        width: 320px; /* 사이드바를 320px로 고정! 딱 보기 좋은 사이즈입니다. */
+        min-width: 320px;
+        position: sticky; 
+        top: 20px; 
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .card-grid { 
+        /* 메인이 넓어졌으니 카드 개수를 자동으로 늘려줍니다 */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+        gap: 20px; 
+    }
+    #builderGrid {
+        /* 사이드바가 좁아졌으니 빌더는 다시 1열로 깔끔하게 나열 */
+        display: flex !important;
+        flex-direction: column !important;
+    }
+}
 
         /* 모바일 대응 */
         @media (max-width: 768px) {
