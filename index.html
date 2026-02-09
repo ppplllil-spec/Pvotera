@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>플리튭라정보</title>
+    <title>PLLI-TUB-RA | 플리정보공간</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -22,19 +22,28 @@
         .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
         
         .cat-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
-        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .chip.active { background: white; color: var(--accent); }
 
-        /* 카드 그리드 */
+        /* 카드 스타일 */
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 22px; padding: 12px; border: 1px solid var(--glass); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
         .card-img { width: 100%; height: 95px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; cursor: pointer; }
-        .card-title { font-size: 13px; font-weight: 800; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .card-title { font-size: 13px; font-weight: 800; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; }
+        .go-btn { width: 100%; background: white; color: var(--text); border: none; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; }
+
+        /* 투표 팁 카드 스타일 */
+        .card.tip-card { border: 2.5px solid var(--accent) !important; background: rgba(255, 255, 255, 0.8) !important; box-shadow: 0 10px 20px rgba(125, 147, 235, 0.2); }
+        .card.tip-card .card-title { color: var(--accent); }
+        .card.tip-card .go-btn { background: var(--accent); color: white; }
+
+        /* 팁 연동 배지 */
+        .tip-link-badge { position: absolute; top: 10px; right: 10px; background: rgba(125, 147, 235, 0.9); color: white; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 800; cursor: pointer; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         /* 플로팅 제보 패널 */
         #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 350px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .fab-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; box-shadow: 0 8px 20px rgba(125,147,235,0.5); z-index: 10001; transition: 0.4s; border: none; }
+        .fab-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 35px; cursor: pointer; box-shadow: 0 8px 20px rgba(125,147,235,0.5); z-index: 10001; transition: 0.3s; border: none; }
         .fab-btn.active { background: #ff7675; transform: rotate(45deg); }
 
         /* 뮤밍 편집 모달 */
@@ -47,17 +56,17 @@
         .gallery-title { font-size: 11px; font-weight: 700; color: #444; height: 32px; overflow: hidden; }
         .direct-reg { background: var(--top); border-radius: 20px; padding: 15px; margin-bottom: 10px; display: flex; gap: 10px; align-items: end; }
 
-        /* PC 사이드바 설정 */
+        /* PC 레이아웃 */
         @media (min-width: 1024px) {
             .container { max-width: 1300px; }
             #mainLayout { display: flex; gap: 25px; align-items: start; }
             #gridContainer { flex: 1; }
             .sidebar { width: 320px; min-width: 320px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
-            .card-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+            .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
             #builderGrid { display: flex !important; flex-direction: column !important; }
         }
-
         .builder-item { background: white; padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass); margin-bottom: 8px; }
+        .thanks-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; z-index: 5000; display: none; }
         #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
         #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
     </style>
@@ -65,6 +74,7 @@
 <body>
 
 <div id="modal" onclick="this.style.display='none'"><img id="modalImg"></div>
+<div id="thanksPopup" class="thanks-popup">소중한 제보 감사해요!</div>
 <button class="fab-btn" id="fabBtn" onclick="toggleRegPanel()">+</button>
 
 <div class="container">
@@ -75,27 +85,41 @@
             <span>🗳️ 정보 제보 및 등록</span>
             <span onclick="toggleRegPanel()" style="cursor:pointer; opacity:0.5;">✕</span>
         </div>
+        
+        <label style="font-size:11px; font-weight:800; margin-left:5px;">투표 앱 선택 (해당 시)</label>
+        <select id="regVoteApp" class="input-box">
+            <option value="">없음 (일반 정보)</option>
+            <option value="아이돌챔프">아이돌챔프</option>
+            <option value="엠넷플러스">엠넷플러스</option>
+            <option value="팬플러스">팬플러스</option>
+            <option value="최애돌">최애돌</option>
+            <option value="포도알">포도알</option>
+            <option value="팬캐스트">팬캐스트</option>
+            <option value="뮤빗">뮤빗</option>
+        </select>
         <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소">
         <input type="text" id="regTitle" class="input-box" placeholder="📝 제목">
-        <button onclick="submitData()" id="subBtn" class="check-btn" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:15px;">등록하기</button>
+        <div style="display: flex; gap: 5px;">
+            <div style="flex:1;"><label style="font-size:11px; font-weight:800;">시작일</label><input type="datetime-local" id="regStart" class="input-box"></div>
+            <div style="flex:1;"><label style="font-size:11px; font-weight:800;">마감일</label><input type="datetime-local" id="regDeadline" class="input-box"></div>
+        </div>
+        <button onclick="submitData()" id="subBtn" class="go-btn" style="background:var(--accent); color:white; padding:15px; border-radius:15px;">등록하기</button>
     </div>
 
     <input type="text" id="search" class="input-box" placeholder="검색어를 입력하세요..." oninput="renderCards()">
     <div class="cat-group">
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
-        <div class="chip" onclick="setCat(this, 'streaming')">🎧 뮤밍</div>
+        <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 앱 팁</div>
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
     </div>
 
     <div id="mainLayout">
         <div id="gridContainer"><div class="card-grid" id="grid"></div></div>
-
         <div class="sidebar">
             <div class="glass-panel">
                 <div style="font-weight: 900; margin-bottom: 10px;">📢 NOTICE</div>
                 <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div>
             </div>
-
             <div class="glass-panel" style="border: 2px solid var(--accent);">
                 <div style="font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
                     <span>🎧 실시간 뮤밍 빌더</span>
@@ -104,20 +128,19 @@
                 <div id="totalTimeDisplay" style="font-size: 11px; color: var(--accent); margin-bottom:10px;">총 0분 0초</div>
                 <div id="builderGrid"></div>
                 <div style="margin-top: 10px; display: flex; gap: 5px;">
-                    <button onclick="playBuilderList()" class="go-btn" style="background:#555; color:white; flex:1; border:none; border-radius:12px; padding:10px; font-weight:800; cursor:pointer;">▶ 재생목록 전체재생</button>
-                    <button onclick="clearBuilder()" class="go-btn" style="flex:0.4; border:1px solid #ddd; border-radius:12px; cursor:pointer;">삭제</button>
+                    <button onclick="playBuilderList()" class="go-btn" style="background:#555; color:white; flex:1; font-weight:800;">▶ 전체재생</button>
+                    <button onclick="clearBuilder()" class="go-btn" style="flex:0.4; border:1px solid #ddd;">삭제</button>
                 </div>
             </div>
-
             <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
                 <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
                     <span>💬 플리 대기실</span>
-                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer; opacity: 0.7;">(변경)</button>
+                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer;">(변경)</button>
                 </div>
                 <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
                 <div style="display: flex; gap: 5px;">
-                    <input type="text" id="chatInput" class="input-box" style="margin-bottom:0; flex: 1;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
-                    <button onclick="window.sendChat()" class="check-btn" style="flex: 0.3; background:var(--accent); color:white; border:none; border-radius:12px;">전송</button>
+                    <input type="text" id="chatInput" class="input-box" style="margin-bottom:0; flex:1;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
+                    <button onclick="window.sendChat()" class="go-btn" style="flex:0.3; background:var(--accent); color:white; padding:0;">전송</button>
                 </div>
             </div>
         </div>
@@ -130,24 +153,14 @@
             <h2 style="margin:0; font-size:20px;">🎵 곡 선택 및 추가</h2>
             <button onclick="closeBuilderModal()" style="border:none; background:none; font-size:24px; cursor:pointer;">✕</button>
         </div>
-
         <div class="direct-reg">
-            <div style="flex:1;">
-                <label style="font-size:11px; font-weight:800;">유튜브 링크</label>
-                <input type="text" id="directLink" class="input-box" style="margin-bottom:0;" placeholder="https://youtu.be/..." onchange="fetchYoutubeTitle()">
-            </div>
-            <div style="flex:1;">
-                <label style="font-size:11px; font-weight:800;">곡 제목</label>
-                <input type="text" id="directTitle" class="input-box" style="margin-bottom:0;" placeholder="제목 자동 입력">
-            </div>
-            <button onclick="addDirect()" class="check-btn" style="padding:12px 20px; border-radius:15px; background:var(--accent); color:white; border:none;">추가</button>
+            <div style="flex:1;"><label style="font-size:11px; font-weight:800;">유튜브 링크</label><input type="text" id="directLink" class="input-box" placeholder="https://youtu.be/..." onchange="fetchYoutubeTitle()"></div>
+            <div style="flex:1;"><label style="font-size:11px; font-weight:800;">곡 제목</label><input type="text" id="directTitle" class="input-box" placeholder="제목 자동 입력"></div>
+            <button onclick="addDirect()" class="go-btn" style="padding:12px 20px; background:var(--accent); color:white;">추가</button>
         </div>
-
         <div style="margin-bottom: 20px;">
             <input type="text" id="gallerySearch" class="input-box" placeholder="🔍 찾으시는 곡 제목을 입력하세요..." oninput="filterGallery()" style="margin-bottom: 5px; border: 2px solid var(--accent);">
         </div>
-
-        <div style="font-weight: 800; color: var(--accent);">🔥 추천 곡 갤러리</div>
         <div id="galleryGrid" class="gallery-grid"></div>
     </div>
 </div>
@@ -163,16 +176,14 @@
     localStorage.setItem('chatNickname', myNick);
     window.sendChat = function() {
         const input = document.getElementById('chatInput');
-        if (!input.value.trim()) return;
-        push(chatRef, { nick: myNick, msg: input.value, time: Date.now() });
-        input.value = '';
+        if (input.value.trim()) { push(chatRef, { nick: myNick, msg: input.value, time: Date.now() }); input.value = ''; }
     };
-    onChildAdded(chatRef, (data) => {
-        const chat = data.val();
+    onChildAdded(chatRef, (d) => {
+        const c = d.val();
         const box = document.getElementById('chatMessages');
         const div = document.createElement('div');
         div.style.marginBottom = "8px";
-        div.innerHTML = `<span style="color:${chat.nick===myNick?'var(--accent)':'#555'}; font-weight:700;">[${chat.nick}]</span> ${chat.msg}`;
+        div.innerHTML = `<span style="color:${c.nick===myNick?'var(--accent)':'#555'}; font-weight:700;">[${c.nick}]</span> ${c.msg}`;
         box.appendChild(div); box.scrollTop = box.scrollHeight;
     });
 </script>
@@ -182,45 +193,71 @@
     const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
     let cachedData = [], builderData = JSON.parse(localStorage.getItem('plaveBuilder') || '[]');
-    let galleryData = [];
+    let galleryData = [], tipsData = [], currentSheet = 'data', isAdmin = false;
 
     function toggleRegPanel() {
         const p = document.getElementById('registrationPanel');
-        p.style.display = p.style.display === 'block' ? 'none' : 'block';
-        document.getElementById('fabBtn').classList.toggle('active');
+        const b = document.getElementById('fabBtn');
+        const v = p.style.display === 'block';
+        if (!v) {
+            const now = new Date();
+            const after3 = new Date(); after3.setDate(now.getDate() + 3);
+            document.getElementById('regStart').value = now.toISOString().slice(0, 16);
+            document.getElementById('regDeadline').value = after3.toISOString().slice(0, 16);
+        }
+        p.style.display = v ? 'none' : 'block';
+        b.classList.toggle('active', !v);
+    }
+
+    async function fetchTipsOnly() {
+        const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tips!A2:N?key=${API_KEY}`).then(res => res.json());
+        tipsData = r.values || [];
     }
 
     async function fetchData() {
-        const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/data!A2:N?key=${API_KEY}`).then(res => res.json());
+        const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`).then(res => res.json());
         cachedData = r.values || [];
         renderCards();
     }
 
     function renderCards() {
+        const q = document.getElementById('search').value.toLowerCase();
         const g = document.getElementById('grid'); g.innerHTML = '';
-        [...cachedData].reverse().forEach(row => {
-            const div = document.createElement('div'); div.className = 'card';
-            div.innerHTML = `${row[7]?`<img src="${row[7]}" class="card-img" onclick="showImg('${row[7]}')">`:''}<div class="card-title">${row[4]}</div><button class="go-btn" onclick="window.open('${row[1]}','_blank')">이동</button>`;
+        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
+        displayData.forEach((row) => {
+            const [date, link, cat, appName, title, start, deadline, img] = row;
+            if(q && !title.toLowerCase().includes(q)) return;
+            const div = document.createElement('div');
+            const isTip = currentSheet === 'tips';
+            div.className = `card ${isTip ? 'tip-card' : ''}`;
+            let tipBadge = "";
+            if (!isTip && appName && tipsData.find(t => t[4] === appName)) {
+                tipBadge = `<div class="tip-link-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁 보기</div>`;
+            }
+            div.innerHTML = `${tipBadge}${isAdmin?'<div class="handle">⠿</div>':''}${img?`<img src="${img}" class="card-img" onclick="showImg('${img}')">`:''}<div class="card-title">${title}</div><button class="go-btn" onclick="window.open('${link}','_blank')">${isTip?'가이드 보기':'이동'}</button>`;
             g.appendChild(div);
         });
     }
 
-    // --- 뮤밍 빌더 로직 ---
+    function setCat(b, s) { 
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        if(b) b.classList.add('active'); 
+        else document.querySelector(`.chip[onclick*="'${s}'"]`).classList.add('active');
+        currentSheet = s; fetchData(); 
+    }
+
     function saveAndRender() {
         localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
         const grid = document.getElementById('builderGrid'); grid.innerHTML = '';
-        let total = 0;
         builderData.forEach((item, idx) => {
-            total += 210;
             const div = document.createElement('div'); div.className = 'builder-item';
-            div.innerHTML = `<div class="v-drag-handle">⠿</div><div style="flex:1; cursor:pointer;" onclick="playSingleTrack('${item.url}')"><div style="font-weight:800;">${item.title}</div><div style="font-size:10px; color:var(--accent);">🎧 클릭시 덮어씌워 재생</div></div><button onclick="removeFromBuilder(${idx})" style="border:none; background:none; color:red; cursor:pointer;">×</button>`;
+            div.innerHTML = `<div class="v-drag-handle">⠿</div><div style="flex:1; cursor:pointer;" onclick="playSingleTrack('${item.url}')"><div style="font-weight:800;">${item.title}</div><div style="font-size:10px; color:var(--accent);">🎧 클릭시 덮어씌워 재생</div></div><button onclick="removeFromBuilder(${idx})" style="border:none; background:none; color:red;">×</button>`;
             grid.appendChild(div);
         });
-        document.getElementById('totalTimeDisplay').innerText = `총 ${Math.floor(total/60)}분 ${total%60}초`;
+        document.getElementById('totalTimeDisplay').innerText = `총 ${Math.floor(builderData.length*210/60)}분 ${builderData.length*210%60}초`;
     }
 
     function playSingleTrack(url) { window.open(url, "plavePlayer", "width=1000,height=700"); }
-
     function playBuilderList() {
         const ids = builderData.map(i => {
             const m = i.url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|\/v\/|embed\/))([^?&"'>]+)/);
@@ -229,18 +266,15 @@
         if(ids.length) window.open(`https://www.youtube.com/watch_videos?video_ids=${ids.join(',')}`, "plavePlayer", "width=1000,height=700");
     }
 
-    // 갤러리 로드 & 검색
     async function renderGallery() {
         const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`).then(res => res.json());
-        galleryData = r.values || [];
-        displayGallery(galleryData);
+        galleryData = r.values || []; displayGallery(galleryData);
     }
-
     function displayGallery(data) {
         const grid = document.getElementById('galleryGrid'); grid.innerHTML = '';
-        const validData = data.filter(row => row[10] && row[10].includes('youtu'));
-        if (!validData.length) { grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; opacity:0.5;">결과가 없어요 🥲</div>`; return; }
-        validData.forEach(row => {
+        const valid = data.filter(row => row[10] && row[10].includes('youtu'));
+        if(!valid.length) { grid.innerHTML=`<div style="grid-column:1/-1; text-align:center; padding:40px; opacity:0.5;">결과가 없어요 🥲</div>`; return; }
+        valid.forEach(row => {
             const vid = row[10].split('/').pop().split('=').pop();
             const d = document.createElement('div'); d.className = 'gallery-item';
             d.onclick = () => { builderData.push({title:row[4], url:row[10], id:Date.now()}); saveAndRender(); };
@@ -248,14 +282,10 @@
             grid.appendChild(d);
         });
     }
-
     function filterGallery() {
         const kw = document.getElementById('gallerySearch').value.toLowerCase();
-        const filtered = galleryData.filter(row => (row[4] || "").toLowerCase().includes(kw));
-        displayGallery(filtered);
+        displayGallery(galleryData.filter(row => (row[4] || "").toLowerCase().includes(kw)));
     }
-
-    // 유튜브 제목 자동 가져오기
     async function fetchYoutubeTitle() {
         const url = document.getElementById('directLink').value.trim();
         const titleInput = document.getElementById('directTitle');
@@ -263,32 +293,36 @@
         titleInput.placeholder = "⌛ 가져오는 중...";
         try {
             const res = await fetch(`https://noembed.com/embed?url=${url}`);
-            const data = await res.json();
+            const data = await response.json();
             if (data.title) titleInput.value = data.title;
         } catch (e) { titleInput.placeholder = "제목 입력"; }
     }
-
     function addDirect() {
         const l = document.getElementById('directLink').value.trim(), t = document.getElementById('directTitle').value.trim();
         if (l && l.includes('youtu')) {
             builderData.push({title: t || "유튜브 영상", url: l, id: Date.now()});
-            saveAndRender();
-            document.getElementById('directLink').value = ''; document.getElementById('directTitle').value = '';
-            alert('리스트에 담겼습니다!');
+            saveAndRender(); document.getElementById('directLink').value = ''; document.getElementById('directTitle').value = ''; alert('리스트에 담겼습니다!');
         } else alert('유튜브 링크를 확인해주세요.');
     }
-
+    async function submitData() {
+        const payload = { sheetName: "data", url: document.getElementById('regLink').value, userTitle: document.getElementById('regTitle').value, tag: document.getElementById('regVoteApp').value, start: document.getElementById('regStart').value, deadline: document.getElementById('regDeadline').value };
+        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+        if((await res.json()).result === "success") { 
+            const p = document.getElementById('thanksPopup'); p.style.display='block'; setTimeout(()=>p.style.display='none', 2000);
+            toggleRegPanel(); fetchData(); 
+        }
+    }
     function openBuilderModal() { document.getElementById('builderModal').style.display='flex'; renderGallery(); }
     function closeBuilderModal() { document.getElementById('builderModal').style.display='none'; }
     function removeFromBuilder(i) { builderData.splice(i,1); saveAndRender(); }
     function clearBuilder() { if(confirm("비울까요?")) { builderData=[]; saveAndRender(); } }
     function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
-    function askAdmin() { if(prompt("비번?")==="0312") { document.querySelectorAll('.admin-only').forEach(e=>e.style.display='block'); } }
+    function askAdmin() { if(prompt("비번?")==="0312") { isAdmin=true; fetchData(); } }
     async function loadNotice() {
         const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/notice!A:A?key=${API_KEY}`).then(res => res.json());
         document.getElementById('noticeDisplay').innerHTML = (r.values || []).map(n => `• ${n[0]}<br>`).join('');
     }
-    window.onload = () => { fetchData(); loadNotice(); saveAndRender(); };
+    window.onload = async () => { await fetchTipsOnly(); fetchData(); loadNotice(); saveAndRender(); };
 </script>
 </body>
 </html>
