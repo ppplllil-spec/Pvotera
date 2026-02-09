@@ -10,3 +10,7 @@ const CONFIG = {
     // 3. 연동하신 구글 시트의 고유 ID
     SPREADSHEET_ID: "1_6U4Y16v_U4lK9h2H7G7h7V8-V8_v8_V8v8V8v8V8v8" 
 };
+const API_KEY = "AIzaSyB6r7cGl5np3FhKsB_wDnwNGbS14RfoCE4";
+    const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
+    
