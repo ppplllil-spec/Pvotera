@@ -41,6 +41,68 @@
         .v-name { font-size: 13px; font-weight: 800; }
         .v-time-tag { font-size: 11px; color: var(--accent); font-weight: 700; }
         .v-del { background: none; border: none; color: #ff7675; cursor: pointer; font-size: 16px; }
+        /* ✨ 1. 전체 스크롤바 디자인 (슬림 & 라운드) */
+::-webkit-scrollbar {
+    width: 6px; /* 스크롤바 폭 */
+}
+::-webkit-scrollbar-track {
+    background: transparent; /* 트랙 배경 (투명하게) */
+}
+::-webkit-scrollbar-thumb {
+    background: var(--accent); /* 스크롤바 색상 */
+    border-radius: 10px; /* 둥글게 */
+    opacity: 0.5;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5a75db; /* 마우스 올렸을 때 더 진하게 */
+}
+
+/* ✨ 2. 파일 선택 버튼 커스텀 */
+.file-upload-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+/* 실제 투박한 input은 숨기기 */
+#regFile {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); border: 0;
+}
+/* 이쁘게 보일 가짜 버튼(Label) */
+.file-label {
+    display: block;
+    background: white;
+    color: var(--text);
+    padding: 12px 15px;
+    border-radius: 15px;
+    border: 1px solid var(--glass);
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.file-label:hover {
+    background: var(--accent);
+    color: white;
+}
+.file-name {
+    font-size: 11px;
+    margin-top: 5px;
+    color: var(--accent);
+    text-align: center;
+    display: block;
+}
+        @media (min-width: 768px) {
+    .container {
+        max-width: 1000px; /* PC에서는 더 넓게 */
+    }
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 카드가 옆으로 나열됨 */
+        gap: 20px;
+    }
+}
     </style>
 </head>
 <body>
@@ -59,7 +121,11 @@
         <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소">
         <input type="text" id="regTitle" class="input-box" placeholder="📝 제목">
         <input type="datetime-local" id="regDeadline" class="input-box">
-        <input type="file" id="regFile" accept="image/*" class="input-box" onchange="processWebP(this)">
+        <div class="file-upload-wrapper">
+    <label for="regFile" class="file-label">🖼️ 리스트 이미지 선택 (클릭)</label>
+    <input type="file" id="regFile" accept="image/*" onchange="updateFileName(this)">
+    <span id="fileNameDisplay" class="file-name">선택된 파일 없음</span>
+</div>
         <button onclick="submitData()" id="subBtn" class="check-btn" style="width:100%; padding:15px; font-size:14px;">등록하기</button>
         <button onclick="saveOrder()" class="go-btn" style="width:100%; margin-top:10px; border:1px solid var(--accent);">↕ 순서 저장하기</button>
     </div>
@@ -152,47 +218,40 @@
         } catch(e) { console.error("데이터 로드 실패"); }
     }
 
-    function renderCards() {
-        const q = document.getElementById('search').value.toLowerCase();
-        const g = document.getElementById('grid'); g.innerHTML = '';
-        const now = new Date();
-        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
+function renderCards() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const g = document.getElementById('grid'); g.innerHTML = '';
+    const now = new Date();
+    
+    // 관리자면 시트 순서대로(드래그용), 일반 유저면 최신순(역순)
+    const displayData = isAdmin ? cachedData : [...cachedData].reverse();
 
-        displayData.forEach((row, idx) => {
-            const [date, link, cat, tag, title, start, deadline, img] = row;
-            if(q && !title.toLowerCase().includes(q)) return;
+    displayData.forEach((row, idx) => {
+        const [date, link, cat, tag, title, start, deadline, img] = row;
+        if(q && !title.toLowerCase().includes(q)) return;
 
-            const id = `chk_${date}_${idx}`;
-            const isDone = localStorage.getItem(id) === 'true';
-            
-            let timerHtml = '';
-            if(deadline) {
-                const diff = new Date(deadline) - now;
-                if(diff > 0 && diff < 86400000) {
-                    const h = String(Math.floor(diff/3600000)).padStart(2,'0');
-                    const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-                    const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-                    timerHtml = `<div class="timer">⏰ ${h}:${m}:${s} 남음</div>`;
-                }
-            }
+        const realIdx = isAdmin ? idx : cachedData.length - 1 - idx;
+        const id = `chk_${date}_${realIdx}`;
+        const isDone = localStorage.getItem(id) === 'true';
 
-            const c = document.createElement('div');
-            c.className = `card ${isDone ? 'done' : ''}`;
-            c.setAttribute('data-idx', isAdmin ? idx : cachedData.length - 1 - idx);
-            c.innerHTML = `
-                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 이동</div>` : ''}
-                ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
-                <div class="card-title">${title}</div>
-                ${timerHtml}
-                <div class="btn-row">
-                    <button class="go-btn" onclick="openPlayer('${link}')">이동</button>
-                    <button class="check-btn" onclick="toggleChk('${id}', this)">${isDone?'완료 ✅':'체크'}</button>
-                </div>
-                ${isAdmin ? `<button onclick="editItem(${idx})" style="font-size:10px; margin-top:5px; border:none; background:none; color:#999; cursor:pointer;">✏️ 수정</button>` : ''}
-            `;
-            g.appendChild(c);
-        });
-    }
+        const c = document.createElement('div');
+        c.className = `card ${isDone ? 'done' : ''}`;
+        c.setAttribute('data-idx', realIdx);
+        
+        // 관리자일 때만 '⠿ 이동 핸들'과 '✏️ 수정' 버튼이 보이게 구성
+        c.innerHTML = `
+            ${isAdmin ? `<div class="handle" style="display:block;">⠿ 드래그하여 이동</div>` : ''}
+            ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
+            <div class="card-title">${title}</div>
+            <div class="btn-row">
+                <button class="go-btn" onclick="openPlayer('${link}')">이동</button>
+                <button class="check-btn" onclick="toggleChk('${id}', this)">${isDone?'완료 ✅':'체크'}</button>
+            </div>
+            ${isAdmin ? `<button onclick="editItem(${realIdx})" style="font-size:10px; margin-top:8px; border:none; background:none; color:var(--accent); cursor:pointer; font-weight:800;">✏️ 내용 수정하기</button>` : ''}
+        `;
+        g.appendChild(c);
+    });
+}
 
     function openPlayer(url) {
         window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes");
@@ -245,7 +304,13 @@
         document.getElementById('vMin').value = '';
         document.getElementById('vSec').value = '';
     }
-
+function updateFileName(input) {
+    const fileName = input.files[0] ? input.files[0].name : "선택된 파일 없음";
+    document.getElementById('fileNameDisplay').innerText = fileName;
+    
+    // 기존에 있던 WebP 변환 함수 호출
+    processWebP(input);
+}
     async function loadQuickMenuFromRadio() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
         try {
