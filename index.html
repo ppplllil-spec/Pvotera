@@ -79,6 +79,27 @@
 .builder-item:hover {
     border-color: var(--accent);
 }
+        /* 1. 드래그 중인 원래 위치에 남은 잔상 (투명하게) */
+.sortable-ghost {
+    opacity: 0.3 !important;
+    background: var(--accent) !important;
+    border: 2px dashed white !important;
+}
+
+/* 2. 마우스를 따라다니는 실제 카드 (살짝 커지고 그림자) */
+.sortable-chosen {
+    cursor: grabbing !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+}
+
+/* 드래그 가능함을 알리는 핸들 효과 */
+.handle:hover, .v-drag-handle:hover {
+    color: white !important;
+    background: var(--accent);
+    border-radius: 5px;
+}
         /* PC 레이아웃 (1024px 이상) */
         @media (min-width: 1024px) {
             .container { max-width: 1200px; }
@@ -379,15 +400,20 @@ function saveAndRender() {
 }
 // 메인 카드 드래그 (관리자 전용)
 Sortable.create(document.getElementById('grid'), {
-    handle: '.handle', // 반드시 '⠿ 드래그 이동' 핸들을 잡아야만 움직이게 설정
-    animation: 150,
-    ghostClass: 'blue-background-class' 
+handle: '.handle',
+    animation: 200, // 살짝 더 부드럽게
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    forceFallback: true // 모바일/PC 모두 동일한 드래그 느낌을 위해
 });
 
 // 뮤밍 빌더 드래그
 Sortable.create(document.getElementById('builderGrid'), {
-    handle: '.v-drag-handle', // 새로 만든 빌더용 핸들 아이콘
-    animation: 150,
+    handle: '.v-drag-handle',
+    animation: 200,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    forceFallback: true,
     onEnd: function() {
         const newOrder = [];
         document.querySelectorAll('.builder-item').forEach(el => {
@@ -396,7 +422,6 @@ Sortable.create(document.getElementById('builderGrid'), {
         });
         builderData = newOrder;
         localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
-        // 다시 그리지 않고 데이터만 업데이트해서 끊김 없게 함
     }
 });
     function openPlayer(url) { window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes"); }
