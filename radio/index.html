@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>라디오 신청 - PL-TUB-RA</title>
+    <title>라디오 신청</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -53,9 +53,9 @@
 </div>
 
 <script>
-    const API_KEY = "수희님의_API_KEY";
-    const SHEET_ID = "수희님의_SHEET_ID";
-    const GAS_URL = "수희님의_GAS_배포_URL";
+    const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
+    const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
     
     let cachedData = [], isAdmin = false;
 
@@ -98,20 +98,51 @@
         });
     }
 
-    // 문구 복사 로직 (DJ태그 + 해시태그 조합)
-    function copyText(dj, hash, station) {
-        let ment = "";
-        if(station === 'M') {
-            ment = `[사연신청] ${dj} ${hash} 오늘도 좋은 노래 들려주세요!`;
-        } else {
-            ment = `${dj} ${hash} 플레이브 노래 신청합니다! 💙💜💗❤️🖤`;
-        }
-        
-        navigator.clipboard.writeText(ment).then(() => {
-            alert("문구가 복사되었습니다! ✨\n\n" + ment);
-        });
-    }
+function copyText(dj, hash, station, title, extraLinks) {
+    let ment = "";
+    
+    // 링크 분리 (K열에 스포티파이, 유튜브 순으로 적었다고 가정)
+    const links = extraLinks ? extraLinks.split(/[\s,]+/) : ["", ""];
+    const spotify = links[0] || "";
+    const youtube = links[1] || "";
+    const allLinks = links.filter(l => l !== "").join('\n');
 
+    // [L열] 방송국 코드에 따른 멘트 분기
+    switch (station) {
+        case 'HALLYU': // @HALLYUIL (영어 양식)
+            ment = `Hi. ${dj}\n\nI would like to request ${title} by #PLAVE\nThank you so much.\n\n${spotify}`;
+            break;
+
+        case 'TOCA': // TOCA NA STAR (포르투갈어 양식)
+            ment = `Olá.\nGostaria de solicitar a música ${title} da #PLAVE.\nMuito obrigado.\n\n${hash}\n\n${spotify}\n${youtube}`;
+            break;
+
+        case 'GV': // GV 99.1 (DJ Clyde 영어 양식)
+            ment = `Hi, DJ Clyde!\nI'd like to request ${title} by #PLAVE.\nThank you so much.\n\n${hash}\n\n${allLinks}`;
+            break;
+
+        case 'URBANA': // La Urbana (스페인어 양식)
+            ment = `Buenos días a todos ${dj} este sábado me encantaría escuchar ${title} de PLAVE ${hash}`;
+            break;
+
+        case 'WPVR': // WPVR Kevin DJ (기존 양식)
+            ment = `Hi. DJ Kevin. ${dj}\nI'd like to request ${title} by #PLAVE\nThank you so much.\n\n${hash}\n\n${allLinks}`;
+            break;
+
+        case 'M': // 국내 MBC/KBS 등
+            ment = `[사연신청] ${dj} ${hash} 플레이브의 ${title} 신청합니다! 오늘도 좋은 노래 부탁드려요. 💙💜💗❤️🖤\n\n${allLinks}`;
+            break;
+
+        default: // 기타 일반 양식
+            ment = `${dj} ${hash}\nI request ${title} by PLAVE. Thank you!\n\n${allLinks}`;
+    }
+    
+    // 클립보드 복사 실행
+    navigator.clipboard.writeText(ment).then(() => {
+        alert(`${station} 맞춤 사연이 복사되었습니다! ✨\n\n` + ment);
+    });
+}
+    
     async function saveOrder() {
         const cards = document.querySelectorAll('.card');
         const newOrderedData = Array.from(cards).map(c => cachedData[c.getAttribute('data-idx')]);
