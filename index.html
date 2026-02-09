@@ -317,11 +317,30 @@
             if (!isT && appName && tipsData.find(t => t[4] === appName)) {
                 badge = `<div class="tip-link-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁</div>`;
             }
-            div.innerHTML = `${badge}${img?`<img src="${img}" class="card-img" onclick="showImg('${img}')">`:''}<div class="card-title">${title}</div><button class="go-btn" onclick="window.open('${link}','_blank')">${isT?'보기':'이동'}</button>`;
-            g.appendChild(div);
+// renderCards 함수 내의 div.innerHTML 부분을 아래와 같이 수정하세요.
+div.innerHTML = `
+    ${badge}
+    ${isAdmin ? '<div class="handle">⠿</div>' : ''}
+    ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
+    <div class="card-title">${title}</div>
+    <button class="go-btn" onclick="handleTipClick('${link}', '${title}')">
+        ${isT ? '팁 확인' : '이동'}
+    </button>
+`;
         });
     }
-
+// 🆕 팁 클릭 처리 (주소 여부 확인)
+function handleTipClick(link, title) {
+    // 링크가 http로 시작하는 정상적인 주소인 경우
+    if (link && link.startsWith('http')) {
+        window.open(link, '_blank');
+    } 
+    // 링크가 없거나 일반 텍스트인 경우 (알림창으로 팁 노출)
+    else {
+        const msg = link ? link : "등록된 상세 가이드가 없습니다. 🥲";
+        alert(`[${title}] 팁\n\n${msg}`);
+    }
+}
     async function submitData() {
         const target = document.getElementById('regTargetSheet').value;
         const btn = document.getElementById('subBtn');
