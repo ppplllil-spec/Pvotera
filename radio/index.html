@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PLLI-TUB-RA | 라디오 신청</title>
-    <<script src="config.js"></script>
+ <script>
+  // Vercel 환경 변수를 브라우저 변수로 연결해주는 다리 역할입니다.
+  window.API_KEY_ENV = "<%= API_KEY %>"; 
+</script>
+<script src="config.js"></script>
 
 <script>
     // 2. config.js에 정의된 CONFIG 객체에서 값을 가져와 연결합니다.
