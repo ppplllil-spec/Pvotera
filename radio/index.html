@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PLLI-TUB-RA | 라디오 신청</title>
+    <script src="config.js"></script>
+    <script src="radio_script.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
@@ -102,7 +104,7 @@
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDZQL2iDN220bBdU0xiYDShqLRRp6AQJDI",
+        apiKey: "",
         authDomain: "chat-9035a.firebaseapp.com",
         databaseURL: "https://chat-9035a-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "chat-9035a",
@@ -162,9 +164,6 @@
 </script>
 
 <script>
-    const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
-    const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
     
     let cachedData = [], isAdmin = false;
 
