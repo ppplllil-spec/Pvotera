@@ -3,47 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>플리튭라 정보공유</title>
-    <link rel="manifest" href="./manifest.json">
+    <title>PL-TUB-RA (Admin)</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         :root { --top: #c5c9f4; --btm: #fbc2eb; --glass: rgba(255,255,255,0.4); --text: #4b4b7c; --accent: #7d93eb; }
         body { font-family: 'Pretendard', sans-serif; background: linear-gradient(135deg, var(--top), var(--btm)); margin: 0; padding: 20px; min-height: 100vh; color: var(--text); background-attachment: fixed; }
-        .container { width: 100%; max-width: 480px; margin: 0 auto; }
         
-        /* 알림 바 스타일 */
-        #alertBar { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(125,147,235,0.9); color: white; padding: 12px 40px; border-radius: 30px; font-weight: 900; z-index: 1000; transition: 0.5s; backdrop-filter: blur(10px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        /* 리셋 알림 바 */
+        #alertBar { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(125,147,235,0.9); color: white; padding: 10px 30px; border-radius: 30px; font-weight: 900; z-index: 3000; transition: 0.5s; backdrop-filter: blur(10px); }
         #alertBar.show { top: 30px; }
 
-        /* 헤더 및 검색 */
-        header { text-align: center; padding-bottom: 20px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; }
+        header { text-align: center; padding: 20px 0; position: relative; cursor: pointer; }
         .logo { font-size: 28px; font-weight: 900; color: white; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .search-box { width: 100%; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--glass); background: var(--glass); backdrop-filter: blur(10px); outline: none; box-sizing: border-box; margin-bottom: 20px; font-family: inherit; }
+        
+        /* 입력창 및 검색창 */
+        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.3); }
+        .input-box { width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid var(--glass); background: white; outline: none; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; font-size: 14px; }
+        .search-box { background: var(--glass); margin-bottom: 20px; }
 
+        .admin-only { display: none; }
+        
         /* 카테고리 칩 */
-        .cat-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 10px; scrollbar-width: none; }
-        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .cat-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; }
+        .chip { padding: 8px 18px; border-radius: 20px; background: rgba(255,255,255,0.2); border: 1px solid var(--glass); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .chip.active { background: white; color: var(--accent); }
 
         /* 카드 그리드 */
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 20px; padding: 12px; border: 1px solid var(--glass); position: relative; display: flex; flex-direction: column; transition: 0.3s; }
+        .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-radius: 22px; padding: 12px; border: 1px solid var(--glass); display: flex; flex-direction: column; transition: 0.3s; position: relative; }
         .card.done { opacity: 0.5; filter: grayscale(0.8); }
-        .card-img { width: 100%; height: 90px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; cursor: pointer; }
-        .card-tag { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 8px; color: white; background: var(--accent); width: fit-content; margin-bottom: 6px; }
-        .card-title { font-size: 13px; font-weight: 700; line-height: 1.3; margin-bottom: 5px; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .card-desc { font-size: 10px; color: #666; margin-bottom: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; cursor: pointer; }
-        .card-desc.open { -webkit-line-clamp: unset; }
-        .timer { font-size: 10px; font-weight: 800; color: #ff7675; margin-bottom: 10px; }
+        .handle { cursor: grab; background: rgba(0,0,0,0.1); text-align: center; border-radius: 8px; font-size: 10px; padding: 4px; margin-bottom: 8px; display: none; }
+        .card-img { width: 100%; height: 95px; border-radius: 12px; object-fit: cover; margin-bottom: 8px; cursor: pointer; }
+        .card-title { font-size: 13px; font-weight: 800; line-height: 1.3; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .timer { font-size: 10px; font-weight: 900; color: #ff7675; margin: 8px 0; }
         
         .btn-row { display: flex; gap: 5px; margin-top: auto; }
-        .go-btn, .check-btn { flex: 1; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; }
+        .go-btn, .check-btn { flex: 1; border: none; padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; text-decoration: none; }
         .go-btn { background: white; color: var(--text); }
         .check-btn { background: var(--accent); color: white; }
 
-        /* 라이트박스 */
-        #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:2000; padding:20px; box-sizing:border-box; }
-        #modal img { max-width:100%; max-height:80%; border-radius:15px; }
+        /* 모달 (이미지 크게보기) */
+        #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
+        #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
     </style>
 </head>
 <body>
@@ -52,36 +55,25 @@
 <div id="modal" onclick="this.style.display='none'"><img id="modalImg"></div>
 
 <div class="container">
-    <header><div class="logo">PL-TUB-RA</div></header>
-    <div class="glass-input-panel" style="background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.3);">
-    <div style="font-size: 14px; font-weight: 800; margin-bottom: 15px; color: white;">✨ 새로운 정보 등록</div>
-    
-    <select id="sheetSelect" class="search-box" style="margin-bottom: 10px;">
-        <option value="data">🗳️ 투표 / 📢 정보 (data)</option>
-        <option value="streaming">🎧 뮤밍 리스트 (streaming)</option>
-    </select>
+    <header onclick="askAdmin()"><div class="logo">PL-TUB-RA</div></header>
 
-    <input type="text" id="regLink" class="search-box" style="margin-bottom: 10px;" placeholder="🔗 등록할 사이트 링크">
-    <input type="text" id="regTitle" class="search-box" style="margin-bottom: 10px;" placeholder="📝 제목 입력">
-    
-    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <div style="flex: 1;">
-            <label style="font-size: 11px; color: white; font-weight: bold; display: block; margin-bottom: 5px;">⏰ 마감 일시 (선택)</label>
-            <input type="datetime-local" id="regDeadline" class="search-box" style="margin-bottom: 0;">
-        </div>
-        <div style="flex: 1;">
-            <label style="font-size: 11px; color: white; font-weight: bold; display: block; margin-bottom: 5px;">🖼️ 이미지 (선택)</label>
-            <input type="file" id="regFile" accept="image/*" style="font-size: 11px; color: white; width: 100%;">
-        </div>
+    <div id="adminPanel" class="glass-panel admin-only">
+        <select id="sheetSelect" class="input-box">
+            <option value="data">🗳️ 투표/정보 (data)</option>
+            <option value="streaming">🎧 뮤밍리스트 (streaming)</option>
+        </select>
+        <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소">
+        <input type="text" id="regTitle" class="input-box" placeholder="📝 제목">
+        <input type="datetime-local" id="regDeadline" class="input-box">
+        <input type="file" id="regFile" accept="image/*" class="input-box" onchange="processWebP(this)">
+        <button onclick="submitData()" id="subBtn" class="check-btn" style="width:100%; padding:15px; font-size:14px;">등록하기</button>
+        <button onclick="saveOrder()" class="go-btn" style="width:100%; margin-top:10px; border:1px solid var(--accent);">↕ 순서 저장하기</button>
     </div>
 
-    <button onclick="submitData()" id="subBtn" style="width: 100%; padding: 15px; border-radius: 15px; border: none; background: white; color: var(--accent); font-weight: 800; cursor: pointer; transition: 0.3s;">등록하기</button>
-</div>
-    <input type="text" id="search" class="search-box" placeholder="어떤 정보를 찾으시나요?" oninput="renderCards()">
+    <input type="text" id="search" class="input-box search-box" placeholder="검색어를 입력하세요..." oninput="renderCards()">
 
     <div class="cat-group">
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
-        <div class="chip" onclick="setCat(this, 'VOTE')">🗳️ 투표</div>
         <div class="chip" onclick="setCat(this, 'streaming')">🎧 뮤밍</div>
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
     </div>
@@ -90,68 +82,76 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbywBQMHYul3tNDcRJnMgBVICkeyR0yflkB7adCEcQAWsrXv3zU-9aLgl8YBe3mFm6xijg/exec";
-    const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
-    const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
-    let currentSheet = 'data';
-    let cachedData = [];
+    const API_KEY = "수희님의_API_KEY";
+    const SHEET_ID = "수희님의_SHEET_ID";
+    const GAS_URL = "수희님의_GAS_배포_URL";
+    
+    let currentSheet = 'data', cachedData = [], isAdmin = false, tempWebP = "";
 
-    // 정각 알림 함수 (무음 "리셋")
-    function checkReset() {
-        const now = new Date();
-        if (now.getMinutes() === 0 && now.getSeconds() === 0) {
-            const bar = document.getElementById('alertBar');
-            bar.classList.add('show');
-            setTimeout(() => bar.classList.remove('show'), 5000);
+    // 1. 관리자 인증 (비번 0312)
+    function askAdmin() {
+        if(prompt("관리자 비밀번호를 입력하세요.") === "0312") {
+            isAdmin = true;
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+            renderCards();
         }
     }
-    setInterval(checkReset, 1000);
 
+    // 2. 리셋 알림
+    setInterval(() => {
+        const n = new Date();
+        if(n.getMinutes() === 0 && n.getSeconds() === 0) {
+            const b = document.getElementById('alertBar');
+            b.classList.add('show');
+            setTimeout(() => b.classList.remove('show'), 5000);
+        }
+    }, 1000);
+
+    // 3. WebP 변환
+    async function processWebP(input) {
+        if(!input.files[0]) return;
+        const file = input.files[0];
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            canvas.width = 800; canvas.height = (800/img.width)*img.height;
+            ctx.drawImage(img, 0, 0, 800, canvas.height);
+            tempWebP = canvas.toDataURL('image/webp', 0.7).split(',')[1];
+        };
+    }
+
+    // 4. 데이터 페치
     async function fetchData() {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:M?key=${API_KEY}`;
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`;
         try {
-            const res = await fetch(url).then(r => r.json());
-            cachedData = res.values || [];
+            const r = await fetch(url).then(res => res.json());
+            cachedData = r.values || [];
             renderCards();
-        } catch (e) { console.error(e); }
+        } catch(e) { console.error("데이터 로드 실패"); }
     }
 
-    function setCat(btn, sheet) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        currentSheet = (sheet === 'VOTE') ? 'data' : sheet;
-        fetchData();
-    }
-
-    function toggleCheck(id, btn) {
-        const card = btn.closest('.card');
-        card.classList.toggle('done');
-        const isDone = card.classList.contains('done');
-        localStorage.setItem(`check_${id}`, isDone);
-        btn.innerText = isDone ? "완료 ✅" : "체크";
-    }
-
+    // 5. 카드 렌더링
     function renderCards() {
-        const query = document.getElementById('search').value.toLowerCase();
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
+        const q = document.getElementById('search').value.toLowerCase();
+        const g = document.getElementById('grid'); g.innerHTML = '';
+        const now = new Date();
 
-        cachedData.reverse().forEach((row, idx) => {
-            const [date, link, cat, tag, title, desc, deadline, img, dj, hash, extra, st, best] = row;
-            if (query && !title.toLowerCase().includes(query)) return;
+        // 관리자가 아닐 때만 역순(최신순), 관리자 모드에선 시트 순서 그대로(드래그용)
+        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
 
-            const id = date + idx;
-            const isDone = localStorage.getItem(`check_${id}`) === 'true';
+        displayData.forEach((row, idx) => {
+            const [date, link, cat, tag, title, start, deadline, img] = row;
+            if(q && !title.toLowerCase().includes(q)) return;
+
+            const id = `chk_${date}_${idx}`;
+            const isDone = localStorage.getItem(id) === 'true';
             
-            const card = document.createElement('div');
-            card.className = `card ${isDone ? 'done' : ''}`;
-            
-            // 카운트다운 로직
             let timerHtml = '';
-            if (deadline) {
-                const end = new Date(deadline);
-                const diff = end - new Date();
-                if (diff > 0 && diff < 86400000) {
+            if(deadline) {
+                const diff = new Date(deadline) - now;
+                if(diff > 0 && diff < 86400000) {
                     const h = String(Math.floor(diff/3600000)).padStart(2,'0');
                     const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
                     const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
@@ -159,28 +159,65 @@
                 }
             }
 
-            card.innerHTML = `
+            const c = document.createElement('div');
+            c.className = `card ${isDone ? 'done' : ''}`;
+            c.setAttribute('data-idx', isAdmin ? idx : cachedData.length - 1 - idx);
+            c.innerHTML = `
+                ${isAdmin ? `<div class="handle" style="display:block;">⠿ 드래그하여 이동</div>` : ''}
                 ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
-                <div class="card-tag">${tag || 'INFO'}</div>
                 <div class="card-title">${title}</div>
-                <div class="card-desc" onclick="this.classList.toggle('open')">${desc || ''}</div>
                 ${timerHtml}
                 <div class="btn-row">
                     <a href="${link}" target="_blank" class="go-btn">이동</a>
-                    <button class="check-btn" onclick="toggleCheck('${id}', this)">${isDone ? '완료 ✅' : '체크'}</button>
+                    <button class="check-btn" onclick="toggleChk('${id}', this)">${isDone?'완료 ✅':'체크'}</button>
                 </div>
             `;
-            grid.appendChild(card);
+            g.appendChild(c);
         });
     }
 
-    function showImg(src) {
-        document.getElementById('modalImg').src = src;
-        document.getElementById('modal').style.display = 'flex';
+    // 6. 드래그 앤 드롭 저장
+    async function saveOrder() {
+        const cards = document.querySelectorAll('.card');
+        const newOrderedData = Array.from(cards).map(c => cachedData[c.getAttribute('data-idx')]);
+        const res = await fetch(GAS_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ action: "updateOrder", sheetName: currentSheet, orderedData: newOrderedData }) 
+        });
+        if((await res.json()).result === "success") alert("순서 저장 완료! ✨");
     }
 
+    // 7. 신규 등록
+    async function submitData() {
+        const btn = document.getElementById('subBtn');
+        const payload = {
+            sheetName: document.getElementById('sheetSelect').value,
+            url: document.getElementById('regLink').value,
+            userTitle: document.getElementById('regTitle').value,
+            deadline: document.getElementById('regDeadline').value,
+            category: document.getElementById('sheetSelect').value === 'data' ? '투표/정보' : '뮤밍',
+            tag: document.getElementById('sheetSelect').value === 'data' ? 'VOTE' : 'STREAM',
+            file: tempWebP ? { base64: tempWebP, type: 'image/webp', name: 'upload' } : null
+        };
+        btn.innerText = "등록 중...";
+        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+        if((await res.json()).result === "success") { alert("등록 완료!"); location.reload(); }
+    }
+
+    // 기타 유틸
+    function toggleChk(id, b) { 
+        const card = b.closest('.card'); card.classList.toggle('done');
+        const done = card.classList.contains('done'); localStorage.setItem(id, done);
+        b.innerText = done ? '완료 ✅' : '체크'; 
+    }
+    function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
+    function setCat(b, s) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); currentSheet=s; fetchData(); }
+
     window.onload = fetchData;
-    setInterval(renderCards, 1000); // 1초마다 타이머 갱신
+    setInterval(renderCards, 1000);
+
+    // 드래그 라이브러리 활성화
+    Sortable.create(grid, { handle: '.handle', animation: 150 });
 </script>
 </body>
 </html>
