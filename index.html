@@ -57,14 +57,12 @@
             100% { transform: scale(0.2) translateY(50px); opacity: 0; }
         }
 
-        /* 스크롤바 */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #6c5ce7; border-radius: 10px; border: 2px solid var(--top); }
 
-        .container { width: 100%; max-width: 480px; margin: 0 auto; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; padding-bottom: 80px; }
         
-        /* 3. 로고 네온 사인 효과 */
-        header { text-align: center; padding: 30px 0; }
+        header { text-align: center; padding: 40px 0 20px 0; }
         .logo { 
             font-size: 32px; font-weight: 900; color: white; letter-spacing: 2px;
             animation: neon-pulse 2s ease-in-out infinite alternate;
@@ -74,22 +72,28 @@
             to { text-shadow: 0 0 25px rgba(162, 155, 254, 1), 0 0 10px rgba(255,255,255,0.5); }
         }
 
+        /* 공통 패널 구분감 강화 */
         .glass-panel { 
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px; padding: 20px; margin-bottom: 20px; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1) !important; 
+            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            border-radius: 30px; padding: 25px; margin-bottom: 30px; 
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
         }
 
         .input-box { 
             width: 100%; padding: 14px 18px; border-radius: 18px; 
-            border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); 
+            border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); 
             color: white; outline: none; box-sizing: border-box; 
             margin-bottom: 12px; font-family: inherit; transition: 0.3s; font-size: 14px;
         }
-        .input-box::placeholder { color: rgba(255,255,255,0.5); }
         input[type="datetime-local"] { font-size: 11px !important; padding: 10px 5px !important; color-scheme: dark; }
 
+        .cat-group { 
+            display: flex; gap: 12px; overflow-x: auto; 
+            padding: 10px 5px 35px 5px; /* 하단 여백 추가 */
+            margin-bottom: 15px; 
+        }
         .chip { 
             padding: 10px 22px; border-radius: 50px; background: rgba(255,255,255,0.1); 
             border: 1px solid rgba(255,255,255,0.2); font-size: 14px; font-weight: 700; 
@@ -97,47 +101,57 @@
         }
         .chip.active { background: white; color: #6c5ce7; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 
-        /* 4. 카드 슬롯 및 둥둥 떠다니는 애니메이션 */
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; transition: 0.3s; }
+        /* 카드 슬롯 구분감 & 여백 극대화 */
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; transition: 0.3s; }
         .card { 
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
-            border-radius: 25px; padding: 15px; border: 1px solid rgba(255,255,255,0.15); 
+            background: rgba(255, 255, 255, 0.18) !important; 
+            backdrop-filter: blur(30px) saturate(150%); -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border-radius: 25px; padding: 20px; 
+            border: 1.5px solid rgba(255, 255, 255, 0.4) !important; 
             display: flex; flex-direction: column; position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(162, 155, 254, 0.1);
             animation: floating 4s ease-in-out infinite;
             animation-delay: calc(var(--i) * 0.2s);
         }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         .card:hover { 
-            transform: translateY(-15px) scale(1.02) !important; 
-            background: rgba(255,255,255,0.2); border-color: white; 
-            box-shadow: 0 0 25px rgba(162, 155, 254, 0.5); z-index: 5;
+            transform: translateY(-18px) scale(1.03) !important; 
+            background: rgba(255, 255, 255, 0.25) !important; border-color: #ffffff !important; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(162, 155, 254, 0.6); z-index: 5;
         }
-        .card-img { width: 100%; height: 95px; border-radius: 18px; object-fit: cover; margin-bottom: 8px; border: 2px solid rgba(255,255,255,0.1); }
-        .card-title { font-size: 13px; font-weight: 800; height: 34px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 8px; color: #f1f2f6; }
+        .card-img { width: 100%; height: 100px; border-radius: 18px; object-fit: cover; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.15); }
+        .card-title { 
+            font-size: 14px; font-weight: 800; height: 36px; overflow: hidden; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; 
+            margin-bottom: 12px; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
         .go-btn { 
             width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; 
-            padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer;
+            padding: 12px; border-radius: 15px; font-size: 12px; font-weight: 800; cursor: pointer;
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s;
         }
-        .go-btn:active { transform: scale(0.95); filter: brightness(1.2); }
 
         /* 팁 카드 컴팩트 모드 */
-        .card-grid.tips-mode { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .card.tip-card { border: 1.5px solid var(--neon-purple) !important; padding: 8px !important; min-height: auto !important; }
-        .card.tip-card .card-img { height: 55px !important; }
-        .card.tip-card .card-title { font-size: 11px !important; height: auto !important; -webkit-line-clamp: 1 !important; color: white; text-align: center; }
-        .card.tip-card .go-btn { background: white; color: #6c5ce7; box-shadow: none; }
+        .card-grid.tips-mode { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .card.tip-card { border: 2px solid var(--neon-purple) !important; padding: 10px !important; }
+        .card.tip-card .card-img { height: 60px !important; }
 
         .tip-link-badge { 
-            position: absolute; top: 10px; right: 10px; background: white; color: #6c5ce7; 
+            position: absolute; top: 12px; right: 12px; background: white; color: #6c5ce7; 
             padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 900; z-index: 10; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 320px; }
+        /* 사이드바 여백 및 공지사항 강조 */
+        .sidebar { display: flex; flex-direction: column; gap: 40px; }
+        #noticeDisplay { font-size: 13px; line-height: 1.8; opacity: 0.95; padding: 5px 0; color: #efebff; }
+        .sidebar .glass-panel:first-child { border-top: 3px solid var(--neon-purple); margin-bottom: 10px; }
+
+        #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 330px; }
         .fab-btn { 
-            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; 
+            position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; 
             background: white; color: #6c5ce7; border-radius: 50%; font-size: 35px; border: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10001; transition: 0.3s; 
         }
@@ -145,11 +159,10 @@
 
         @media (min-width: 1024px) {
             .container { max-width: 1300px; }
-            #mainLayout { display: flex; gap: 25px; }
+            #mainLayout { display: flex; gap: 55px; }
             #gridContainer { flex: 1; }
-            .sidebar { width: 320px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; }
-            .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-            .card-grid.tips-mode { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+            .sidebar { width: 320px; position: sticky; top: 30px; gap: 45px; }
+            .card-grid { gap: 30px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
         }
     </style>
 </head>
@@ -167,12 +180,12 @@
             <span>🗳️ 정보 등록</span>
             <span onclick="toggleRegPanel()" style="cursor:pointer; opacity:0.5;">✕</span>
         </div>
-        <select id="regTargetSheet" class="input-box" onchange="toggleRegFields()">
+        <select id="regTargetSheet" class="input-box" onchange="toggleRegFields()" style="background: rgba(255,255,255,0.2);">
             <option value="data">🌟 일반 정보 / 투표 등록</option>
             <option value="tips">💡 투표 앱 팁 등록</option>
         </select>
         <div id="voteAppArea">
-            <select id="regVoteApp" class="input-box">
+            <select id="regVoteApp" class="input-box" style="background: rgba(255,255,255,0.2);">
                 <option value="">투표 앱 선택 (해당 시)</option>
                 <option value="kooky">kooky</option><option value="덕애드">덕애드</option><option value="딩고">딩고</option>
                 <option value="링크/tin">링크/tin</option><option value="마이원픽">마이원픽</option><option value="뮤니버스">뮤니버스</option>
@@ -194,7 +207,8 @@
         <button onclick="submitData()" id="subBtn" class="go-btn" style="padding:15px; border-radius:18px;">등록하기</button>
     </div>
 
-    <input type="text" id="search" class="input-box" placeholder="검색어를 입력하세요..." oninput="renderCards()">
+    <input type="text" id="search" class="input-box" placeholder="검색어를 입력하세요..." oninput="renderCards()" style="background: rgba(255,255,255,0.15); margin-bottom: 20px;">
+    
     <div class="cat-group">
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
         <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 팁</div>
@@ -204,12 +218,12 @@
     <div id="mainLayout">
         <div id="gridContainer"><div class="card-grid" id="grid"></div></div>
         <div class="sidebar">
-            <div class="glass-panel"><div style="font-weight: 900; margin-bottom: 10px; color: var(--neon-purple);">📢 NOTICE</div><div id="noticeDisplay" style="font-size: 12px; line-height: 1.6;"></div></div>
+            <div class="glass-panel"><div style="font-weight: 900; margin-bottom: 12px; color: var(--neon-purple); letter-spacing: 1px;">📢 NOTICE</div><div id="noticeDisplay"></div></div>
             <div class="glass-panel" style="border: 2px solid var(--neon-purple);">
-                <div style="font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between;"><span>🎧 뮤밍 빌더</span><button onclick="openBuilderModal()" class="chip" style="background:white; color:#6c5ce7; border:none; padding:4px 10px; font-size: 11px;">+ 편집</button></div>
-                <div id="totalTimeDisplay" style="font-size: 11px; color: var(--neon-purple); margin-bottom:10px;">총 0분 0초</div>
+                <div style="font-weight: 900; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;"><span>🎧 뮤밍 빌더</span><button onclick="openBuilderModal()" class="chip" style="background:white; color:#6c5ce7; border:none; padding:4px 10px; font-size: 11px;">+ 편집</button></div>
+                <div id="totalTimeDisplay" style="font-size: 11px; color: var(--neon-purple); margin-bottom:12px;">총 0분 0초</div>
                 <div id="builderGrid"></div>
-                <div style="margin-top: 10px; display: flex; gap: 5px;"><button onclick="playBuilderList()" class="go-btn" style="flex:1;">▶ 전체재생</button><button onclick="clearBuilder()" class="go-btn" style="flex:0.4; background:rgba(255,255,255,0.2); box-shadow: none;">삭제</button></div>
+                <div style="margin-top: 15px; display: flex; gap: 8px;"><button onclick="playBuilderList()" class="go-btn" style="flex:1;">▶ 전체재생</button><button onclick="clearBuilder()" class="go-btn" style="flex:0.4; background:rgba(255,255,255,0.2); box-shadow: none;">삭제</button></div>
             </div>
         </div>
     </div>
@@ -221,7 +235,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
     let cachedData = [], tipsData = [], currentSheet = 'data', isAdmin = false;
 
-    // 🆕 마우스/터치 별가루 효과 로직
+    // 마우스/터치 별가루 효과
     document.addEventListener('mousemove', (e) => createParticle(e.clientX, e.clientY));
     document.addEventListener('touchmove', (e) => createParticle(e.touches[0].clientX, e.touches[0].clientY));
 
@@ -282,7 +296,7 @@
             const div = document.createElement('div');
             const isT = currentSheet === 'tips';
             div.className = `card ${isT ? 'tip-card' : ''}`;
-            div.style.setProperty('--i', index); // 애니메이션 엇박자용
+            div.style.setProperty('--i', index);
 
             let badge = "";
             if (!isT && appName && tipsData.find(t => t[4] === appName)) {
