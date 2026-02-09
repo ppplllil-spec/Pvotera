@@ -105,10 +105,54 @@
             .container { max-width: 1200px; }
             #mainLayout { display: flex; gap: 25px; align-items: start; }
             #gridContainer { flex: 1; }
-            .sidebar { width: 320px; position: sticky; top: 20px; }
+            .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
             .card-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         }
+/* 뮤밍 빌더 사이드바 전용 스타일 */
+.sidebar-builder {
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
 
+#builderGrid {
+    display: flex;
+    flex-direction: column; /* 사이드바니까 다시 세로로 나열하되 compact하게 */
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* 빌더 아이템 더 작고 예쁘게 */
+.builder-item {
+    padding: 8px 12px;
+    background: white;
+    font-size: 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--glass);
+}
+
+/* 제보 감사 팝업 스타일 */
+.thanks-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 900;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    z-index: 5000;
+    display: none;
+}
         #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
         #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
     </style>
@@ -155,7 +199,13 @@
     <div id="mainLayout">
         <div id="gridContainer">
             <div class="card-grid" id="grid"></div>
-            
+        </div>
+
+        <div class="sidebar">
+            <div class="glass-panel">
+                <div style="font-weight: 900; margin-bottom: 10px;">📢 NOTICE</div>
+                <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div>
+            </div>
             <div class="glass-panel" style="margin-top: 40px; border: 2px solid var(--accent);">
                 <div style="font-weight: 900; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center;">
                     <span>🎧 나만의 실시간 뮤밍리스트</span>
@@ -167,13 +217,6 @@
                     <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555;">▶ 전체 순서대로 재생</button>
                     <button onclick="clearBuilder()" class="go-btn" style="flex: 0.4; border: 1px solid #ddd;">전체 삭제</button>
                 </div>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <div class="glass-panel">
-                <div style="font-weight: 900; margin-bottom: 10px;">📢 NOTICE</div>
-                <div id="noticeDisplay" style="font-size: 12px; line-height: 1.6; opacity: 0.9;"></div>
             </div>
             <div class="glass-panel" style="height: 450px; display: flex; flex-direction: column;">
                 <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
@@ -187,6 +230,8 @@
     </div>
 </div>
 
+<div id="thanksPopup" class="thanks-popup">💙 소중한 제보 감사해요! 플리님! 💙</div>
+    
 <script type="module">
     // Firebase SDK 및 함수 임포트
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -355,7 +400,36 @@ document.getElementById('regLink').addEventListener('change', async function() {
             g.appendChild(c);
         });
     }
-
+async function submitData() {
+    const btn = document.getElementById('subBtn');
+    const payload = {
+        sheetName: document.getElementById('sheetSelect').value,
+        url: document.getElementById('regLink').value,
+        userTitle: document.getElementById('regTitle').value,
+        deadline: document.getElementById('regDeadline').value,
+        file: tempWebP ? { base64: tempWebP, type: 'image/webp', name: 'upload' } : null
+    };
+    
+    btn.innerText = "제보 중...";
+    const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
+    const result = await res.json();
+    
+    if(result.result === "success") {
+        // 감사 팝업 띄우기
+        const popup = document.getElementById('thanksPopup');
+        popup.style.display = 'block';
+        setTimeout(() => { popup.style.display = 'none'; }, 3000);
+        
+        // 입력창 초기화
+        document.getElementById('regLink').value = '';
+        document.getElementById('regTitle').value = '';
+        document.getElementById('regDeadline').value = '';
+        btn.innerText = "등록하기";
+        
+        // 리스트 새로고침
+        fetchData();
+    }
+}
     // 퀵 등록 관련 함수들
     async function loadQuickMenuFromRadio() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
