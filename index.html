@@ -12,11 +12,7 @@
         
         /* 스크롤바 커스텀 */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
-        #alertBar { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(125,147,235,0.9); color: white; padding: 10px 30px; border-radius: 30px; font-weight: 900; z-index: 3000; transition: 0.5s; backdrop-filter: blur(10px); }
-        #alertBar.show { top: 30px; }
 
         .container { width: 100%; max-width: 480px; margin: 0 auto; transition: 0.3s; }
         header { text-align: center; padding: 20px 0; cursor: pointer; }
@@ -42,21 +38,39 @@
         .go-btn { background: white; color: var(--text); }
         .check-btn { background: var(--accent); color: white; }
 
-        .file-label { display: block; background: white; color: var(--text); padding: 12px; border-radius: 15px; border: 1px solid var(--glass); font-size: 14px; font-weight: 700; text-align: center; cursor: pointer; margin-bottom: 10px; }
-        #regFile { display: none; }
+        /* 🆕 제보 패널 플로팅 설정 */
+        #registrationPanel {
+            display: none; 
+            position: fixed;
+            z-index: 10000;
+            bottom: 100px;
+            right: 25px;
+            width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
 
-        /* 드래그 애니메이션 스타일 */
-        .sortable-ghost { opacity: 0.3 !important; background: var(--accent) !important; border: 2px dashed white !important; }
-        .sortable-chosen { cursor: grabbing !important; box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important; transform: scale(1.02); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* 빌더 아이템 스타일 */
-        .builder-item { background: white; padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--glass); transition: 0.2s; user-select: none; margin-bottom: 8px; }
-        .builder-item:hover { border-color: var(--accent); }
+        /* 🆕 플로팅 버튼 (+) */
+        .fab-btn {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background: var(--accent); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 35px; font-weight: 200; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(125,147,235,0.5);
+            z-index: 10001; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none;
+        }
+        .fab-btn:hover { transform: scale(1.1); }
+        .fab-btn.active { background: #ff7675; transform: rotate(45deg); }
 
         /* 감사 팝업 */
-        .thanks-popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 5000; display: none; }
+        .thanks-popup { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 5000; display: none; }
 
-        /* ✨ PC 레이아웃 (1024px 이상) - 50:50 분할 */
+        /* PC 레이아웃 (1024px 이상) */
         @media (min-width: 1024px) {
             .container { max-width: 1400px; }
             #mainLayout { display: flex; gap: 30px; align-items: start; }
@@ -66,40 +80,46 @@
             #builderGrid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
         }
 
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            #registrationPanel { width: calc(100% - 40px); left: 20px; bottom: 95px; }
+        }
+
         #modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:4000; }
         #modal img { max-width: 90%; max-height: 80%; border-radius: 15px; }
+        .file-label { display: block; background: white; color: var(--text); padding: 12px; border-radius: 15px; border: 1px solid var(--glass); font-size: 14px; font-weight: 700; text-align: center; cursor: pointer; margin-bottom: 10px; }
+        #regFile { display: none; }
     </style>
 </head>
 <body>
 
-<div id="alertBar">리셋</div>
 <div id="modal" onclick="this.style.display='none'"><img id="modalImg"></div>
-<div id="thanksPopup" class="thanks-popup">💙 소중한 제보 감사해요! 플리님! 💙</div>
+<div id="thanksPopup" class="thanks-popup">소중한 제보 감사해요!</div>
+
+<button class="fab-btn" id="fabBtn" onclick="toggleRegPanel()">+</button>
 
 <div class="container">
     <header onclick="askAdmin()"><div class="logo">플리정보공간</div></header>
 
-    <div id="adminNoticePanel" class="glass-panel admin-only">
-        <div style="font-weight: 900; margin-bottom: 15px; color: var(--text);">📢 실시간 공지사항 수정</div>
-        <textarea id="noticeInput" class="input-box" style="height: 100px; resize: none;" placeholder="한 줄에 하나씩 공지내용을 적어주세요."></textarea>
-        <button onclick="saveNotice()" id="noticeBtn" class="check-btn" style="width:100%; padding:12px;">공지사항 즉시 저장</button>
+    <div id="adminNoticePanel" class="glass-panel admin-only" style="margin-bottom: 20px;">
+        <div style="font-weight: 900; margin-bottom: 10px;">📢 실시간 공지사항 수정</div>
+        <textarea id="noticeInput" class="input-box" style="height: 80px; resize: none;"></textarea>
+        <button onclick="saveNotice()" id="noticeBtn" class="check-btn" style="width:100%; padding:10px;">공지 저장</button>
     </div>
 
     <div id="registrationPanel" class="glass-panel">
-        <div style="font-weight: 900; margin-bottom: 15px; color: var(--text);">🗳️ 정보 제보 및 등록</div>
-        <select id="sheetSelect" class="input-box">
-            <option value="data">🗳️ 투표/정보 (data)</option>
-        </select>
+        <div style="font-weight: 900; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between;">
+            <span>🗳️ 정보 제보 및 등록</span>
+            <span onclick="toggleRegPanel()" style="cursor:pointer; opacity:0.5;">✕</span>
+        </div>
+        <select id="sheetSelect" class="input-box"><option value="data">🗳️ 투표/정보 제보</option></select>
         <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소">
-        <input type="text" id="regTitle" class="input-box" placeholder="📝 제목 (링크 넣으면 자동입력)">
+        <input type="text" id="regTitle" class="input-box" placeholder="📝 제목 (자동 추출 예정)">
         <input type="datetime-local" id="regDeadline" class="input-box">
-        
-        <label for="regFile" class="file-label">🖼️ 리스트 이미지 선택 (선택)</label>
+        <label for="regFile" class="file-label">🖼️ 이미지 선택 (선택)</label>
         <input type="file" id="regFile" accept="image/*" onchange="updateFileName(this)">
         <span id="fileNameDisplay" style="font-size:11px; color:var(--accent); display:block; text-align:center; margin-bottom:10px;">선택된 파일 없음</span>
-        
-        <button onclick="submitData()" id="subBtn" class="check-btn" style="width:100%; padding:15px; font-size:14px;">등록하기</button>
-        <button onclick="saveOrder()" class="go-btn admin-only" style="width:100%; margin-top:10px; border:1px solid var(--accent);">↕ 순서 저장하기 (관리자)</button>
+        <button onclick="submitData()" id="subBtn" class="check-btn" style="width:100%; padding:15px;">등록하기</button>
     </div>
 
     <input type="text" id="search" class="input-box search-box" placeholder="검색어를 입력하세요..." oninput="renderCards()">
@@ -111,9 +131,7 @@
     </div>
 
     <div id="mainLayout">
-        <div id="gridContainer">
-            <div class="card-grid" id="grid"></div>
-        </div>
+        <div id="gridContainer"><div class="card-grid" id="grid"></div></div>
 
         <div class="sidebar">
             <div class="glass-panel">
@@ -122,30 +140,30 @@
             </div>
 
             <div class="glass-panel" style="border: 2px solid var(--accent);">
-                <div style="font-weight: 900; margin-bottom: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: 900; margin-bottom: 15px; display: flex; justify-content: space-between;">
                     <span>🎧 나만의 실시간 뮤밍리스트</span>
-                    <div id="totalTimeDisplay" style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 12px;">총 0분 0초</div>
+                    <div id="totalTimeDisplay" style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 10px; font-size: 12px;">0분 0초</div>
                 </div>
                 <div id="quickBtns" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);"></div>
                 <div id="builderGrid" style="min-height: 50px;"></div>
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555;">▶ 전체 재생</button>
-                    <button onclick="clearBuilder()" class="go-btn" style="flex: 0.4; border: 1px solid #ddd;">전체 삭제</button>
+                    <button onclick="playBuilderList()" class="check-btn" style="flex: 1; background: #555;">▶ 재생</button>
+                    <button onclick="clearBuilder()" class="go-btn" style="flex: 0.4; border: 1px solid #ddd;">삭제</button>
                 </div>
             </div>
 
-            <div class="glass-panel" style="height: 450px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
+                <div style="font-weight: 900; margin-bottom: 10px; display: flex; justify-content: space-between;">
                     <span>💬 플리 대기실</span>
-                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer; opacity: 0.7;">(닉네임 변경)</button>
+                    <button onclick="changeNick()" style="font-size:10px; border:none; background:none; color:var(--accent); cursor:pointer; opacity: 0.7;">(변경)</button>
                 </div>
                 <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(255,255,255,0.3); border-radius:15px; padding:10px; font-size:12px; margin-bottom:10px;"></div>
                 <div style="display: flex; gap: 5px;">
                     <input type="text" id="chatInput" class="input-box" style="margin-bottom:0; flex: 1;" placeholder="메시지 입력..." onkeypress="if(event.keyCode==13) window.sendChat()">
-                    <button onclick="window.sendChat()" class="check-btn" style="flex: 0.3; padding: 0 15px;">전송</button>
+                    <button onclick="window.sendChat()" class="check-btn" style="flex: 0.3;">전송</button>
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 
@@ -168,13 +186,8 @@
     const db = getDatabase(app);
     const chatRef = ref(db, 'chats');
 
-    let myNick = localStorage.getItem('chatNickname');
-    if (!myNick) {
-        myNick = prompt("사용하실 닉네임을 입력해주세요! (최대 8자)", "익명플리");
-        if (!myNick || myNick.trim() === "") myNick = "익명플리";
-        myNick = myNick.substring(0, 8);
-        localStorage.setItem('chatNickname', myNick);
-    }
+    let myNick = localStorage.getItem('chatNickname') || "플리_" + Math.floor(Math.random()*1000);
+    localStorage.setItem('chatNickname', myNick);
 
     window.changeNick = function() {
         const newNick = prompt("새로운 닉네임을 입력하세요.");
@@ -209,80 +222,21 @@
     const API_KEY = "AIzaSyDNuBRMC2vXLNaGnDJ4qqq__-z7_WsFZv8";
     const SHEET_ID = "1O4M_r_ZMNFOCRPlIuqMpgfwRtdUSAwY520lyrBX104Y";
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwsaZ9xNvPdZENLmjS-V0sWy22ItvR43YAr3b1K2qTkHrfjUgSedbqnAVpQ2hdc040T/exec";
-    
     let currentSheet = 'data', cachedData = [], isAdmin = false, tempWebP = "";
     let builderData = JSON.parse(localStorage.getItem('plaveBuilder') || '[]');
 
-    // 링크 자동 입력 기능
-    document.getElementById('regLink').addEventListener('change', async function() {
-        const url = this.value.trim();
-        if (!url) return;
+    function toggleRegPanel() {
+        const panel = document.getElementById('registrationPanel');
+        const btn = document.getElementById('fabBtn');
+        const isVisible = panel.style.display === 'block';
+        panel.style.display = isVisible ? 'none' : 'block';
+        btn.classList.toggle('active', !isVisible);
+    }
+
+    document.getElementById('regLink').addEventListener('change', function() {
         const titleInput = document.getElementById('regTitle');
-        if (titleInput.value === "") {
-            titleInput.value = "자동으로 정보를 불러옵니다. (수정 가능)";
-        }
+        if (this.value && titleInput.value === "") titleInput.value = "정보를 자동으로 불러옵니다...";
     });
-
-    function askAdmin() {
-        if(prompt("관리자 비밀번호를 입력하세요.") === "0312") {
-            isAdmin = true;
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            renderCards();
-        }
-    }
-
-    async function loadNotice() {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/notice!A:A?key=${API_KEY}`;
-        try {
-            const r = await fetch(url).then(res => res.json());
-            const notices = r.values || [];
-            document.getElementById('noticeDisplay').innerHTML = notices.map(n => `• ${n[0]}<br>`).join('');
-        } catch(e) { document.getElementById('noticeDisplay').innerText = "공지사항이 없습니다."; }
-    }
-
-    async function saveNotice() {
-        const btn = document.getElementById('noticeBtn');
-        const text = document.getElementById('noticeInput').value.trim();
-        if(!text) return alert("공지 내용을 입력하세요.");
-        btn.innerText = "저장 중...";
-        const noticeList = text.split('\n').map(line => [line]);
-        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "updateNotice", notices: noticeList }) });
-        if((await res.json()).result === "success") { alert("공지 업데이트 완료!"); loadNotice(); btn.innerText = "공지사항 즉시 저장"; }
-    }
-
-    async function fetchData() {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`;
-        try {
-            const r = await fetch(url).then(res => res.json());
-            cachedData = r.values || [];
-            renderCards();
-        } catch(e) { console.error("데이터 로드 실패"); }
-    }
-
-    function renderCards() {
-        const q = document.getElementById('search').value.toLowerCase();
-        const g = document.getElementById('grid'); g.innerHTML = '';
-        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
-        displayData.forEach((row, idx) => {
-            const [date, link, cat, tag, title, start, deadline, img] = row;
-            if(q && !title.toLowerCase().includes(q)) return;
-            const realIdx = isAdmin ? idx : cachedData.length - 1 - idx;
-            const id = `chk_${date}_${realIdx}`;
-            const isDone = localStorage.getItem(id) === 'true';
-            const c = document.createElement('div');
-            c.className = `card ${isDone ? 'done' : ''}`;
-            c.innerHTML = `
-                ${isAdmin ? `<div class="handle" style="display:block; cursor:grab; background:rgba(0,0,0,0.05); text-align:center; font-size:10px; padding:4px; margin-bottom:8px; border-radius:5px;">⠿ 드래그 이동</div>` : ''}
-                ${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}
-                <div class="card-title">${title}</div>
-                <div class="btn-row">
-                    <button class="go-btn" onclick="openPlayer('${link}')">이동</button>
-                    <button class="check-btn" onclick="toggleChk('${id}', this)">${isDone?'완료 ✅':'체크'}</button>
-                </div>
-            `;
-            g.appendChild(c);
-        });
-    }
 
     async function submitData() {
         const btn = document.getElementById('subBtn');
@@ -299,83 +253,82 @@
             const popup = document.getElementById('thanksPopup');
             popup.style.display = 'block'; setTimeout(() => { popup.style.display = 'none'; }, 3000);
             document.getElementById('regLink').value = ''; document.getElementById('regTitle').value = '';
-            btn.innerText = "등록하기"; fetchData();
+            toggleRegPanel(); btn.innerText = "등록하기"; fetchData();
         }
+    }
+
+    // --- 나머지 핵심 함수들 (fetchData, renderCards, builder 로직 등) ---
+    async function fetchData() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`;
+        const r = await fetch(url).then(res => res.json());
+        cachedData = r.values || [];
+        renderCards();
+    }
+
+    function renderCards() {
+        const q = document.getElementById('search').value.toLowerCase();
+        const g = document.getElementById('grid'); g.innerHTML = '';
+        const displayData = isAdmin ? cachedData : [...cachedData].reverse();
+        displayData.forEach((row, idx) => {
+            const [date, link, cat, tag, title, start, deadline, img] = row;
+            if(q && !title.toLowerCase().includes(q)) return;
+            const c = document.createElement('div');
+            c.className = `card`;
+            c.innerHTML = `${isAdmin?'<div class="handle">⠿</div>':''}${img ? `<img src="${img}" class="card-img" onclick="showImg('${img}')">` : ''}<div class="card-title">${title}</div><div class="btn-row"><button class="go-btn" onclick="openPlayer('${link}')">이동</button></div>`;
+            g.appendChild(c);
+        });
+    }
+
+    async function loadNotice() {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/notice!A:A?key=${API_KEY}`;
+        const r = await fetch(url).then(res => res.json());
+        const notices = r.values || [];
+        document.getElementById('noticeDisplay').innerHTML = notices.map(n => `• ${n[0]}<br>`).join('');
     }
 
     async function loadQuickMenuFromRadio() {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/radio!A2:N?key=${API_KEY}`;
-        try {
-            const r = await fetch(url).then(res => res.json());
-            const radioData = r.values || [];
-            const btnContainer = document.getElementById('quickBtns'); btnContainer.innerHTML = ''; 
-            radioData.forEach(row => {
-                const title = row[4], link = row[10], timeInfo = row[13];
-                if (title && link) {
-                    let min = 0, sec = 0;
-                    if (timeInfo) {
-                        const timeMatch = timeInfo.match(/(\d+):(\d+)/) || timeInfo.match(/(\d+)분\s*(\d+)초/);
-                        if (timeMatch) { min = parseInt(timeMatch[1]); sec = parseInt(timeMatch[2]); }
-                    }
-                    const ytLink = link.split(/[\s,]+/).find(l => l.includes('youtu')) || link.split(/[\s,]+/)[0];
-                    const btn = document.createElement('button');
-                    btn.className = 'chip'; btn.innerHTML = `🔥 ${title}`;
-                    btn.onclick = () => quickAdd(title, ytLink, min, sec);
-                    btnContainer.appendChild(btn);
-                }
-            });
-        } catch (e) { console.error("퀵 메뉴 실패"); }
+        const r = await fetch(url).then(res => res.json());
+        const radioData = r.values || [];
+        const btnContainer = document.getElementById('quickBtns'); btnContainer.innerHTML = ''; 
+        radioData.forEach(row => {
+            const btn = document.createElement('button'); btn.className = 'chip'; btn.innerHTML = `🔥 ${row[4]}`;
+            btn.onclick = () => quickAdd(row[4], row[10]);
+            btnContainer.appendChild(btn);
+        });
     }
 
-    function isYoutube(url) { return url.includes('youtu.be') || url.includes('youtube.com'); }
-    function quickAdd(title, url, min, sec) {
-        if (!isYoutube(url)) { alert("유튜브 링크만 가능합니다!"); return; }
-        builderData.push({ title, url, min, sec, id: Date.now() });
+    function quickAdd(title, url) {
+        if (!url || !url.includes('youtu')) return alert("유튜브 링크가 아닙니다!");
+        builderData.push({ title, url, min:3, sec:30, id: Date.now() });
         saveAndRender();
     }
 
     function saveAndRender() {
         localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
         const grid = document.getElementById('builderGrid'); grid.innerHTML = '';
-        let totalSec = 0;
         builderData.forEach((item, index) => {
-            totalSec += (item.min * 60) + item.sec;
             const div = document.createElement('div'); div.className = 'builder-item'; div.setAttribute('data-id', item.id);
-            div.innerHTML = `<div class="v-drag-handle" style="cursor:grab; color:var(--accent);">⠿</div><div style="flex:1;"><div style="font-weight:800;">${item.title}</div><div style="font-size:10px; color:var(--accent);">⏱️ ${item.min}:${item.sec}</div></div><button onclick="removeFromBuilder(${index})" style="border:none; background:none; color:red; cursor:pointer;">×</button>`;
+            div.innerHTML = `<div class="v-drag-handle" style="cursor:grab;">⠿</div><div style="flex:1; font-size:11px;"><b>${item.title}</b></div><button onclick="removeFromBuilder(${index})" style="border:none; background:none; color:red;">×</button>`;
             grid.appendChild(div);
         });
-        const m = Math.floor(totalSec / 60), s = totalSec % 60;
-        document.getElementById('totalTimeDisplay').innerText = `${m}분 ${s}초`;
     }
 
-    Sortable.create(document.getElementById('grid'), { handle: '.handle', animation: 200, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', forceFallback: true });
-    Sortable.create(document.getElementById('builderGrid'), {
-        handle: '.v-drag-handle', animation: 200, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', forceFallback: true,
-        onEnd: function() {
-            const newOrder = [];
-            document.querySelectorAll('#builderGrid .builder-item').forEach(el => {
-                const item = builderData.find(d => d.id == el.getAttribute('data-id'));
-                if(item) newOrder.push(item);
-            });
-            builderData = newOrder; localStorage.setItem('plaveBuilder', JSON.stringify(builderData));
-        }
-    });
-
-    function openPlayer(url) { window.open(url, "plavePlayer", "width=1000,height=700,scrollbars=yes"); }
-    function toggleChk(id, b) { const card = b.closest('.card'); card.classList.toggle('done'); localStorage.setItem(id, card.classList.contains('done')); b.innerText = card.classList.contains('done') ? '완료 ✅' : '체크'; }
-    function showImg(s) { document.getElementById('modalImg').src = s; document.getElementById('modal').style.display='flex'; }
+    function askAdmin() { if(prompt("비번?")==="0312") { isAdmin=true; document.querySelectorAll('.admin-only').forEach(e=>e.style.display='block'); renderCards(); } }
+    function openPlayer(url) { window.open(url, "_blank"); }
     function setCat(b, s) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); currentSheet=s; fetchData(); }
-    function updateFileName(input) { document.getElementById('fileNameDisplay').innerText = input.files[0] ? input.files[0].name : "선택된 파일 없음"; processWebP(input); }
-    function removeFromBuilder(idx) { builderData.splice(idx, 1); saveAndRender(); }
-    function clearBuilder() { if(confirm("비울까요?")) { builderData = []; saveAndRender(); } }
+    function updateFileName(input) { document.getElementById('fileNameDisplay').innerText = input.files[0]?.name || "선택된 파일 없음"; processWebP(input); }
+    function removeFromBuilder(idx) { builderData.splice(idx,1); saveAndRender(); }
+    function clearBuilder() { if(confirm("비울까요?")) { builderData=[]; saveAndRender(); } }
     async function processWebP(input) {
         if(!input.files[0]) return;
         const file = input.files[0]; const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const img = new Image();
         img.src = URL.createObjectURL(file);
-        img.onload = () => { canvas.width = 800; canvas.height = (800/img.width)*img.height; ctx.drawImage(img, 0, 0, 800, canvas.height); tempWebP = canvas.toDataURL('image/webp', 0.7).split(',')[1]; };
+        img.onload = () => { canvas.width = 400; canvas.height = (400/img.width)*img.height; ctx.drawImage(img, 0, 0, 400, canvas.height); tempWebP = canvas.toDataURL('image/webp', 0.5).split(',')[1]; };
     }
 
     window.onload = () => { fetchData(); loadNotice(); loadQuickMenuFromRadio(); saveAndRender(); };
+    Sortable.create(document.getElementById('grid'), {handle: '.handle', animation: 200});
 </script>
 </body>
 </html>
