@@ -5,22 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PLLI-TUB-RA | 플리정보공간</title>    
 
+    <script src="env-config.js"></script> 
+    <script src="config.js"></script>
 
-const API_KEY = "AIzaSyCafVC8WP31_ICvYvM-8EVtbYBZRfrlvo8";
+    <script>
+        // 2. 키를 코드에 직접 쓰지 않고 Vercel 금고(window.API_KEY_ENV)에서 가져옵니다.
+        // 만약 금고가 안 열리면 config.js에 있는 값을 예비로 씁니다.
+        const API_KEY = window.API_KEY_ENV || CONFIG.API_KEY;
+        const SHEET_ID = CONFIG.SPREADSHEET_ID;
+        const GAS_URL = CONFIG.GAS_URL;
+        const firebaseConfig = CONFIG.FIREBASE;
 
+        console.log("보안 연결 설정 완료! 🔒");
+    </script>
 
-
-
-    <script src="env-config.js"></script> <script src="config.js"></script>
-<script>
-    // window.API_KEY_ENV는 env-config.js가 생성되면 자동으로 생깁니다.
-    // 만약 env-config.js가 없거나 비어있으면 데이터가 안 뜨게 됩니다 (보안!)
-    const API_KEY = window.API_KEY_ENV; 
-    
-    const SHEET_ID = CONFIG.SPREADSHEET_ID;
-    const GAS_URL = CONFIG.GAS_URL;
-    const firebaseConfig = CONFIG.FIREBASE;
-</script>
 
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
