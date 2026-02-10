@@ -37,9 +37,9 @@
             font-family: 'Pretendard', sans-serif; 
             background: linear-gradient(160deg, var(--top), #6c5ce7, var(--btm)); 
             margin: 0; padding: 20px; min-height: 100vh; 
-            color: var(--text); 
+            color: #ffffff;
             background-attachment: fixed;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
             overflow-x: hidden;
         }
 
@@ -96,7 +96,8 @@
         }
 
         .glass-panel { 
-            background: rgba(255, 255, 255, 0.1) !important; 
+            color: white;
+            background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
             border-radius: 30px; padding: 25px; margin-bottom: 30px; 
             border: 1.5px solid rgba(255, 255, 255, 0.25);
@@ -107,9 +108,25 @@
 color: #ffffff !important;
     font-weight: 600;
         }
-        input[type="datetime-local"] { font-size: 11px !important; padding: 10px 5px !important; color-scheme: dark; }
-.input-box::placeholder {
-    color: rgba(255, 255, 255, 0.6); /* 플레이스홀더도 잘 보이게 */
+
+/* 3. 정보 등록창(input-box) 스타일 전면 수정 */
+.input-box { 
+    width: 100%; 
+    padding: 12px 15px; 
+    border-radius: 12px; 
+    border: 1px solid rgba(255, 255, 255, 0.3); 
+    background: rgba(0, 0, 0, 0.4) !important; /* 배경을 어둡게 해서 입력한 글자가 잘 보이게 */
+    color: white !important; 
+    outline: none; 
+    box-sizing: border-box; /* 패딩 때문에 박스가 커지는 것 방지 */
+    margin-bottom: 10px; 
+    font-size: 14px;
+}
+        /* 4. 날짜 입력창(datetime-local) 스타일 고정 */
+input[type="datetime-local"] {
+    background: rgba(0, 0, 0, 0.6) !important;
+    color: white !important;
+    color-scheme: dark; /* 브라우저 자체 달력 아이콘 등을 밝게 표시 */
 }
         .cat-group { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px 35px 5px; margin-bottom: 15px; }
         .chip { padding: 10px 22px; border-radius: 50px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; color: white; transition: 0.4s; }
@@ -125,13 +142,13 @@ background: rgba(255, 255, 255, 0.15) !important; /* 투명도를 살짝 조절 
 
         .card:hover { transform: translateY(-18px) scale(1.03) !important; background: rgba(255, 255, 255, 0.25) !important; border-color: #ffffff !important; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(162, 155, 254, 0.6); z-index: 5; }
         .card-img { width: 100%; height: 100px; border-radius: 18px; object-fit: cover; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.15); }
-        .card-title { font-size: 15px; /* 조금 더 키웠어요 */
+        .card-title {
+    font-size: 15px;
     font-weight: 800;
-    color: #ffffff;
-    /* 글자 뒤에 어두운 그림자를 넣어서 배경에서 띄워줍니다 */
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 0, 0, 0.3);
-    line-height: 1.4;
-    margin-bottom: 15px; }
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important; /* 글자를 배경에서 확실히 띄움 */
+    margin-bottom: 15px;
+}
         .go-btn { width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 12px; border-radius: 15px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s; }
         .go-btn:active { transform: scale(0.95); filter: brightness(1.2); }
 
@@ -147,7 +164,12 @@ background: rgba(255, 255, 255, 0.15) !important; /* 투명도를 살짝 조절 
         .card.tip-card .card-img { height: 60px !important; }
 
         .sidebar { display: flex; flex-direction: column; gap: 40px; }
-        #registrationPanel { display: none; position: fixed; z-index: 10000; bottom: 100px; right: 25px; width: 330px; }
+       #registrationPanel {
+    background: rgba(45, 27, 78, 0.9) !important; /* 패널 자체 배경을 더 진하게 */
+    backdrop-filter: blur(20px);
+    border: 1.5px solid var(--neon-purple);
+    padding: 20px;
+}
         .fab-btn { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: white; color: #6c5ce7; border-radius: 50%; font-size: 35px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 10001; transition: 0.3s; }
         .fab-btn.active { background: var(--accent); color: white; transform: rotate(45deg); }
 
