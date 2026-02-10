@@ -104,32 +104,34 @@
         }
 
         .input-box { 
-            width: 100%; padding: 14px 18px; border-radius: 18px; 
-            border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.2); 
-            color: white; outline: none; box-sizing: border-box; 
-            margin-bottom: 12px; font-family: inherit; transition: 0.3s; font-size: 14px;
+color: #ffffff !important;
+    font-weight: 600;
         }
         input[type="datetime-local"] { font-size: 11px !important; padding: 10px 5px !important; color-scheme: dark; }
-
+.input-box::placeholder {
+    color: rgba(255, 255, 255, 0.6); /* 플레이스홀더도 잘 보이게 */
+}
         .cat-group { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px 35px 5px; margin-bottom: 15px; }
         .chip { padding: 10px 22px; border-radius: 50px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; color: white; transition: 0.4s; }
         .chip.active { background: white; color: #6c5ce7; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; transition: 0.3s; }
         .card { 
-            background: rgba(255, 255, 255, 0.18) !important; 
-            backdrop-filter: blur(30px) saturate(150%); -webkit-backdrop-filter: blur(30px) saturate(150%);
-            border-radius: 25px; padding: 20px; border: 1.5px solid rgba(255, 255, 255, 0.4) !important; 
-            display: flex; flex-direction: column; position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: floating 4s ease-in-out infinite;
-            animation-delay: calc(var(--i) * 0.2s);
+background: rgba(255, 255, 255, 0.15) !important; /* 투명도를 살짝 조절 */
+    backdrop-filter: blur(15px); /* 배경을 더 흐리게 해서 글자 집중도 업! */
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
         }
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         .card:hover { transform: translateY(-18px) scale(1.03) !important; background: rgba(255, 255, 255, 0.25) !important; border-color: #ffffff !important; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(162, 155, 254, 0.6); z-index: 5; }
         .card-img { width: 100%; height: 100px; border-radius: 18px; object-fit: cover; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.15); }
-        .card-title { font-size: 14px; font-weight: 800; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 12px; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .card-title { font-size: 15px; /* 조금 더 키웠어요 */
+    font-weight: 800;
+    color: #ffffff;
+    /* 글자 뒤에 어두운 그림자를 넣어서 배경에서 띄워줍니다 */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
+    margin-bottom: 15px; }
         .go-btn { width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 12px; border-radius: 15px; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s; }
         .go-btn:active { transform: scale(0.95); filter: brightness(1.2); }
 
