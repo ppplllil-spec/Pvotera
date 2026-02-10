@@ -87,6 +87,11 @@
             <option value="data">🌟 투표 및 일반정보</option>
             <option value="tips">💡 투표 팁</option>
         </select>
+
+        <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+            <button id="modeLink" onclick="setRegMode('link')" class="m-btn active" style="flex:1">🔗 링크 자동</button>
+            <button id="modeText" onclick="setRegMode('text')" class="m-btn" style="flex:1">📝 직접 입력</button>
+        </div>
         
         <div id="memberArea">
             <div style="font-size:12px; margin-bottom:5px; opacity:0.7;">주인공 멤버 선택</div>
@@ -97,6 +102,7 @@
                 <div class="m-btn" onclick="selectMember(this, '💗')">밤비</div>
                 <div class="m-btn" onclick="selectMember(this, '❤️')">은호</div>
                 <div class="m-btn" onclick="selectMember(this, '🖤')">하민</div>
+                <div class="m-btn" onclick="selectMember(this, '🌟')">전체</div>
             </div>
         </div>
 
@@ -111,8 +117,16 @@
             <option value="아이돌픽">아이돌픽</option><option value="유센">유센</option><option value="유픽">유픽</option><option value="셀럽챔프">셀럽챔프</option>
         </select>
 
-        <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소 (필수)">
+        <div id="linkFieldArea">
+            <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소 (필수)">
+        </div>
+        
         <input type="text" id="regTitle" class="input-box" placeholder="📝 제목 (미입력 시 자동추출)">
+        
+        <div id="textFieldArea" style="display:none;">
+            <input type="text" id="regImg" class="input-box" placeholder="🖼️ 이미지 주소 (선택사항)">
+        </div>
+
         <div id="dateInputArea" style="display: flex; gap: 8px;">
             <input type="datetime-local" id="regStart" class="input-box" style="font-size:11px">
             <input type="datetime-local" id="regDeadline" class="input-box" style="font-size:11px">
@@ -126,6 +140,7 @@
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
         <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 팁</div>
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
+        <div class="chip" onclick="location.href='./hashtag.html'">✨ 해시태그</div>
     </div>
 
     <div id="mainLayout">
@@ -146,7 +161,16 @@
 <button class="fab-btn" onclick="toggleRegPanel()">+</button>
 
 <script>
-    let cachedData = [], tipsOnly = [], currentSheet = 'data', selectedMemberHeart = '';
+    let cachedData = [], tipsOnly = [], currentSheet = 'data', selectedMemberHeart = '', regMode = 'link';
+
+    function setRegMode(mode) {
+        regMode = mode;
+        document.getElementById('modeLink').classList.toggle('active', mode === 'link');
+        document.getElementById('modeText').classList.toggle('active', mode === 'text');
+        document.getElementById('linkFieldArea').style.display = mode === 'link' ? 'block' : 'none';
+        document.getElementById('textFieldArea').style.display = mode === 'text' ? 'block' : 'none';
+        document.getElementById('regTitle').placeholder = mode === 'link' ? "📝 제목 (비워두면 자동추출)" : "📝 등록할 내용 또는 제목";
+    }
 
     function selectMember(btn, heart) {
         document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
@@ -156,11 +180,8 @@
 
     async function fetchData() {
         try {
-            // 1. 팁 전용 시트 데이터를 미리 가져옵니다 (배지 표시용)
             const tr = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tips!A2:N?key=${API_KEY}`).then(res => res.json());
             tipsOnly = tr.values || [];
-
-            // 2. 현재 선택된 탭의 데이터를 가져옵니다.
             const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`).then(res => res.json());
             cachedData = r.values || [];
             renderCards();
@@ -170,23 +191,16 @@
     function renderCards() {
         const q = document.getElementById('search').value.toLowerCase();
         const g = document.getElementById('grid'); g.innerHTML = '';
-        
         const displayData = [...cachedData].reverse();
         displayData.forEach(row => {
             const [date, link, memberHeart, appName, title, start, deadline, img] = row;
             if(q && !title.toLowerCase().includes(q)) return;
-
-            // [추가] 팁 탭일 때, 내용이 없는 앱은 숨김 처리
             if(currentSheet === 'tips' && (!link || !title)) return;
 
             const div = document.createElement('div');
             div.className = 'card';
-            
-            // 멤버별 상징색 하트
             const hColor = memberHeart === '💙' ? '#3498db' : memberHeart === '💜' ? '#9b59b6' : memberHeart === '💗' ? '#ff7495' : memberHeart === '❤️' ? '#e74c3c' : memberHeart === '🖤' ? '#2d3436' : '#fff';
-            
-            // [추가] 팁 배지 확인 (팁 시트에 해당 앱 이름이 있는지 확인)
-            const hasTip = tipsOnly.some(t => t[3] === appName && t[1]); // 앱 이름이 같고 링크가 있는 경우
+            const hasTip = tipsOnly.some(t => t[3] === appName && t[1]);
             const tipBadge = (currentSheet === 'data' && hasTip) ? `<div class="tip-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁</div>` : "";
 
             div.innerHTML = `
@@ -194,7 +208,7 @@
                 ${tipBadge}
                 ${img ? `<img src="${img}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=PLLI'">` : `<div class="card-img" style="background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center;">🌟</div>`}
                 <div class="card-title">${title}</div>
-                <button class="go-btn" onclick="window.open('${link}', '_blank')">${currentSheet === 'tips' ? '팁 보기' : '이동하기'}</button>
+                <button class="go-btn" onclick="${link ? `window.open('${link}', '_blank')` : `alert('등록된 링크가 없습니다.')`}">${currentSheet === 'tips' ? '팁 보기' : '이동하기'}</button>
             `;
             g.appendChild(div);
         });
@@ -203,14 +217,19 @@
     async function submitData() {
         const btn = document.getElementById('subBtn');
         const url = document.getElementById('regLink').value.trim();
-        if(!url) return alert("링크를 넣어주세요!");
+        const title = document.getElementById('regTitle').value.trim();
         
-        btn.innerText = "정보 추출 중..."; btn.disabled = true;
+        if(regMode === 'link' && !url) return alert("링크를 입력해주세요!");
+        if(regMode === 'text' && !title) return alert("내용(제목)을 입력해주세요!");
+        
+        btn.innerText = "처리 중..."; btn.disabled = true;
         const payload = { 
             sheetName: document.getElementById('regTargetSheet').value,
-            url: url, member: selectedMemberHeart,
-            userTitle: document.getElementById('regTitle').value.trim(),
+            url: regMode === 'link' ? url : "",
+            member: selectedMemberHeart,
+            userTitle: title,
             tag: document.getElementById('regVoteApp').value,
+            img: regMode === 'text' ? document.getElementById('regImg').value.trim() : "",
             start: document.getElementById('regStart').value,
             deadline: document.getElementById('regDeadline').value
         };
@@ -224,18 +243,9 @@
     function toggleRegPanel() { const p = document.getElementById('registrationPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
     function toggleRegFields() { document.getElementById('memberArea').style.display = document.getElementById('regTargetSheet').value === 'tips' ? 'none' : 'block'; }
     function setCat(chip, s) { 
-        if(chip) {
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); 
-            chip.classList.add('active'); 
-        } else {
-            // 배지 클릭 등으로 강제 이동 시 칩 활성화 처리
-            document.querySelectorAll('.chip').forEach(c => {
-                if(c.innerText.includes('팁')) c.classList.add('active');
-                else c.classList.remove('active');
-            });
-        }
-        currentSheet = s || 'tips'; 
-        fetchData(); 
+        if(chip) { document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); }
+        else { document.querySelectorAll('.chip').forEach(c => { if(c.innerText.includes('팁')) c.classList.add('active'); else c.classList.remove('active'); }); }
+        currentSheet = s || 'tips'; fetchData(); 
     }
     window.onload = () => { fetchData(); };
 </script>
