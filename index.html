@@ -4,157 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PLLI-TUB-RA | 플리정보공간</title>    
-
     <script src="env-config.js"></script> 
     <script src="config.js"></script>
-
     <script>
         const API_KEY = window.API_KEY_ENV || CONFIG.API_KEY;
         const SHEET_ID = CONFIG.SPREADSHEET_ID;
         const GAS_URL = CONFIG.GAS_URL;
         const firebaseConfig = CONFIG.FIREBASE;
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-
         :root { 
-            --top: #1a1a2e; 
-            --btm: #16213e; 
-            --glass: rgba(255, 255, 255, 0.1); 
-            --text: #ffffff; 
-            --accent: #ff7675; 
-            --neon-purple: #a29bfe; 
-            --neon-blue: #74b9ff;
+            --top: #1a1a2e; --btm: #16213e; --text: #ffffff; 
+            --neon-purple: #a29bfe; --accent: #ff7675;
         }
-
         body { 
-            font-family: 'Pretendard', sans-serif; 
-            background: radial-gradient(circle at top right, #2d1b4e, #1a1a2e); 
-            margin: 0; padding: 15px; min-height: 100vh; 
-            color: var(--text); 
-            background-attachment: fixed;
-            overflow-x: hidden;
+            font-family: 'Pretendard', sans-serif; background: radial-gradient(circle at top right, #2d1b4e, #1a1a2e); 
+            margin: 0; padding: 15px; min-height: 100vh; color: var(--text); background-attachment: fixed; overflow-x: hidden;
         }
-
-        /* 배경 별빛 효과 고도화 */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(1px 1px at 10% 10%, #fff, transparent),
-                radial-gradient(2px 2px at 20% 40%, var(--neon-purple), transparent),
-                radial-gradient(1px 1px at 50% 60%, #fff, transparent);
-            background-size: 300px 300px;
-            animation: stars 150s linear infinite;
-            opacity: 0.4; z-index: -1;
-        }
-        @keyframes stars { from { transform: translateY(0); } to { transform: translateY(-1000px); } }
-
         .container { width: 100%; max-width: 480px; margin: 0 auto; padding-bottom: 100px; }
-        
         header { text-align: center; padding: 40px 0 30px; }
-        .logo { 
-            font-size: 36px; font-weight: 900; color: white; letter-spacing: -1px;
-            text-shadow: 0 0 20px var(--neon-purple);
-            cursor: pointer;
-        }
-
+        .logo { font-size: 32px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 0 15px var(--neon-purple); cursor: pointer; }
         .glass-panel { 
-            background: rgba(255, 255, 255, 0.08); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 24px; padding: 20px; margin-bottom: 25px; 
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255, 255, 255, 0.15);
         }
-
-        /* 정보 등록 창 (고정 위치 및 디자인 수정) */
         #registrationPanel { 
-            display: none; position: fixed; z-index: 10000; 
-            bottom: 90px; right: 15px; left: 15px; /* 모바일 대응 */
-            max-width: 400px; margin: auto;
-            animation: slideUp 0.3s ease-out;
+            display: none; position: fixed; z-index: 10000; bottom: 90px; right: 15px; left: 15px; 
+            max-width: 420px; margin: auto; animation: slideUp 0.3s ease-out;
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
         .input-box { 
-            width: 100%; padding: 12px 15px; border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); 
-            color: white; outline: none; box-sizing: border-box; 
-            margin-bottom: 10px; font-size: 14px; transition: 0.3s;
+            width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); color: white; margin-bottom: 10px; box-sizing: border-box; font-family: inherit;
         }
-        .input-box:focus { border-color: var(--neon-purple); box-shadow: 0 0 10px rgba(162, 155, 254, 0.3); }
-
-        .cat-group { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
-        .chip { 
-            padding: 8px 18px; border-radius: 50px; background: rgba(255,255,255,0.1); 
-            border: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; 
-            cursor: pointer; white-space: nowrap; color: rgba(255,255,255,0.7); transition: 0.3s; 
+        .member-selector { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .m-btn { 
+            padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1); color: white; transition: 0.2s;
         }
-        .chip.active { background: white; color: #2d1b4e; font-weight: 800; box-shadow: 0 0 15px white; }
-
+        .m-btn.active { border-color: white; font-weight: 800; background: rgba(255,255,255,0.3); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
         .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .card { 
-            background: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 15px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s;
+            background: rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); position: relative;
+            transition: 0.3s;
         }
-        .card:hover { transform: translateY(-5px); border-color: var(--neon-purple); background: rgba(255, 255, 255, 0.1); }
+        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); border-color: var(--neon-purple); }
         .card-img { width: 100%; height: 90px; border-radius: 12px; object-fit: cover; margin-bottom: 10px; }
-        .card-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; height: 32px; overflow: hidden; }
-
+        .card-title { font-size: 13px; font-weight: 700; height: 32px; overflow: hidden; margin-bottom: 10px; line-height: 1.3; }
+        .member-heart { position: absolute; top: 10px; left: 10px; font-size: 16px; text-shadow: 0 0 5px rgba(0,0,0,0.5); z-index: 2; }
+        .tip-badge { 
+            position: absolute; top: 10px; right: 10px; background: var(--neon-purple); color: #2d1b4e; 
+            padding: 2px 6px; border-radius: 6px; font-size: 10px; font-weight: 900; z-index: 2; cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
         .go-btn { 
-            width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); 
-            color: white; border: none; padding: 10px; border-radius: 12px; 
-            font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;
+            width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; 
+            padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s;
         }
-        .go-btn:active { transform: scale(0.95); }
-
-        .fab-btn { 
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; 
-            background: white; color: #2d1b4e; border-radius: 50%; font-size: 30px; 
-            border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.4); z-index: 10001; 
-        }
-
-        /* 대기실 디자인 */
-        #chatMessages { 
-            scrollbar-width: thin; scrollbar-color: var(--neon-purple) transparent;
-        }
-        #chatMessages::-webkit-scrollbar { width: 4px; }
-        #chatMessages::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
-
+        .chip { padding: 8px 18px; border-radius: 50px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .chip.active { background: white; color: #2d1b4e; box-shadow: 0 0 15px white; }
+        .fab-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: white; color: #2d1b4e; border-radius: 50%; font-size: 30px; border: none; z-index: 10001; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        
         @media (min-width: 1024px) {
             .container { max-width: 1200px; }
             #mainLayout { display: flex; gap: 30px; }
             .sidebar { width: 320px; position: sticky; top: 20px; height: fit-content; }
-            .card-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            .card-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
         }
     </style>
 </head>
 <body>
-
 <div class="container">
     <header onclick="askAdmin()"><div class="logo">PLLI-TUB-RA</div></header>
 
     <div id="registrationPanel" class="glass-panel">
         <div style="font-weight: 900; margin-bottom: 15px; display: flex; justify-content: space-between;">
-            <span style="color:var(--neon-purple)">🗳️ 정보 등록</span>
+            <span style="color:var(--neon-purple)">🗳️ 정보 제보</span>
             <span onclick="toggleRegPanel()" style="cursor:pointer; opacity:0.5;">✕</span>
         </div>
         <select id="regTargetSheet" class="input-box" onchange="toggleRegFields()">
-            <option value="data">🌟 일반 정보 / 투표 등록</option>
-            <option value="tips">💡 투표 앱 팁 등록</option>
+            <option value="data">🌟 투표 및 일반정보</option>
+            <option value="tips">💡 투표 팁</option>
         </select>
-        <div id="voteAppArea">
-            <select id="regVoteApp" class="input-box">
-                <option value="">투표 앱 선택 (해당 시)</option>
-                <option value="kooky">kooky</option><option value="덕애드">덕애드</option><option value="뮤빗">뮤빗</option><option value="아이돌챔프">아이돌챔프</option><option value="포도알">포도알</option>
-            </select>
+        
+        <div id="memberArea">
+            <div style="font-size:12px; margin-bottom:5px; opacity:0.7;">주인공 멤버 선택</div>
+            <div class="member-selector" id="memberSelector">
+                <div class="m-btn" onclick="selectMember(this, '💙')">플레이브</div>
+                <div class="m-btn" onclick="selectMember(this, '💙')">예준</div>
+                <div class="m-btn" onclick="selectMember(this, '💜')">노아</div>
+                <div class="m-btn" onclick="selectMember(this, '💗')">밤비</div>
+                <div class="m-btn" onclick="selectMember(this, '❤️')">은호</div>
+                <div class="m-btn" onclick="selectMember(this, '🖤')">하민</div>
+            </div>
         </div>
-        <input type="text" id="regTitle" class="input-box" placeholder="📝 제목 (예: 예준 생일투표)">
-        <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 (http://...)">
-        <input type="text" id="regImg" class="input-box" placeholder="🖼️ 이미지 URL (선택)">
+
+        <select id="regVoteApp" class="input-box">
+            <option value="">투표 앱 선택</option>
+            <option value="주간인기상">주간인기상</option><option value="최애돌">최애돌</option><option value="하이어">하이어</option>
+            <option value="딩고">딩고</option><option value="스타트렌드">스타트렌드</option><option value="링크/tin">링크/tin</option>
+            <option value="마이원픽">마이원픽</option><option value="뮤니버스">뮤니버스</option><option value="뮤빗">뮤빗</option>
+            <option value="벅스">벅스</option><option value="후즈팬">후즈팬</option><option value="팬앤스타">팬앤스타</option>
+            <option value="팬캐스트">팬캐스트</option><option value="팬플러스">팬플러스</option><option value="포도알">포도알</option>
+            <option value="피크닠">피크닠</option><option value="아이도키">아이도키</option><option value="아이돌챔프">아이돌챔프</option>
+            <option value="아이돌픽">아이돌픽</option><option value="유센">유센</option><option value="유픽">유픽</option><option value="셀럽챔프">셀럽챔프</option>
+        </select>
+
+        <input type="text" id="regLink" class="input-box" placeholder="🔗 링크 주소 (필수)">
+        <input type="text" id="regTitle" class="input-box" placeholder="📝 제목 (미입력 시 자동추출)">
         <div id="dateInputArea" style="display: flex; gap: 8px;">
             <input type="datetime-local" id="regStart" class="input-box" style="font-size:11px">
             <input type="datetime-local" id="regDeadline" class="input-box" style="font-size:11px">
@@ -164,7 +122,7 @@
 
     <input type="text" id="search" class="input-box" placeholder="🔎 검색어를 입력하세요..." oninput="renderCards()" style="background: rgba(255,255,255,0.05); margin-bottom: 25px; border-radius: 50px; padding-left: 20px;">
     
-    <div class="cat-group">
+    <div class="cat-group" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:15px; scrollbar-width: none;">
         <div class="chip active" onclick="setCat(this, 'data')">🌟 전체</div>
         <div class="chip" onclick="setCat(this, 'tips')">🗳️ 투표 팁</div>
         <div class="chip" onclick="location.href='./radio/index.html'">📻 라디오</div>
@@ -172,77 +130,37 @@
 
     <div id="mainLayout">
         <div id="gridContainer"><div class="card-grid" id="grid"></div></div>
-        
         <div class="sidebar">
-            <div class="glass-panel" style="border-left: 4px solid var(--neon-purple);">
-                <div style="font-weight: 900; margin-bottom: 12px; color: var(--neon-purple); font-size:14px;">📢 NOTICE</div>
-                <div id="noticeDisplay" style="font-size:13px; line-height:1.6; opacity:0.8;"></div>
-            </div>
-            
-            <div class="glass-panel">
-                <div style="font-weight: 900; margin-bottom: 15px; color: var(--neon-purple); font-size:14px;">🎂 PLLI BIRTHDAY</div>
-                <div id="birthdayCountdown" style="display: flex; flex-direction: column; gap: 10px;"></div>
-            </div>
-
-            <div class="glass-panel" style="height: 420px; display: flex; flex-direction: column;">
-                <div style="font-weight: 900; margin-bottom: 12px; display: flex; justify-content: space-between;">
-                    <span style="color: var(--neon-purple);">💬 플리 대기실</span>
-                    <span onclick="changeNick()" style="font-size:11px; cursor:pointer; opacity:0.6;">닉네임 변경</span>
-                </div>
-                <div id="chatMessages" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.2); border-radius:15px; padding:12px; font-size:13px; margin-bottom:12px;"></div>
-                <div style="display: flex; gap: 8px;">
-                    <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="메시지..." onkeypress="if(event.keyCode==13) window.sendChat()">
-                    <button onclick="window.sendChat()" class="go-btn" style="width: 60px;">전송</button>
+            <div class="glass-panel"><div style="font-weight:900; color:var(--neon-purple); margin-bottom:10px;">📢 NOTICE</div><div id="noticeDisplay"></div></div>
+            <div class="glass-panel"><div style="font-weight:900; color:var(--neon-purple); margin-bottom:10px;">🎂 B-DAY</div><div id="birthdayCountdown"></div></div>
+            <div class="glass-panel" style="height: 400px; display: flex; flex-direction: column;">
+                <div id="chatMessages" style="flex:1; overflow-y:auto; font-size:13px; margin-bottom:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:12px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="chatInput" class="input-box" style="margin-bottom:0;" placeholder="채팅..." onkeypress="if(event.keyCode==13) window.sendChat()">
+                    <button onclick="window.sendChat()" class="go-btn" style="width: 50px;">전송</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<button class="fab-btn" id="fabBtn" onclick="toggleRegPanel()">+</button>
+<button class="fab-btn" onclick="toggleRegPanel()">+</button>
 
 <script>
-    let cachedData = [], tipsData = [], currentSheet = 'data', isAdmin = false;
+    let cachedData = [], tipsOnly = [], currentSheet = 'data', selectedMemberHeart = '';
 
-    // 파티클 효과 (최적화)
-    document.addEventListener('mousemove', (e) => createParticle(e.clientX, e.clientY));
-    function createParticle(x, y) {
-        if (Math.random() > 0.2) return; 
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.cssText = `position:fixed; left:${x}px; top:${y}px; width:4px; height:4px; background:white; border-radius:50%; pointer-events:none; z-index:99999; animation:pFade 0.8s forwards;`;
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 800);
-    }
-
-    const members = [
-        { name: "예준 💙", month: 9, day: 12, color: "#3498db" },
-        { name: "노아 💜", month: 2, day: 10, color: "#9b59b6" },
-        { name: "밤비 💗", month: 7, day: 15, color: "#ff7495" },
-        { name: "은호 ❤️", month: 5, day: 24, color: "#e74c3c" },
-        { name: "하민 🖤", month: 11, day: 1, color: "#2d3436" }
-    ];
-
-    function updateBirthdays() {
-        const container = document.getElementById('birthdayCountdown');
-        const now = new Date();
-        const sorted = members.map(m => {
-            let bday = new Date(now.getFullYear(), m.month - 1, m.day);
-            if (now > bday) bday.setFullYear(now.getFullYear() + 1);
-            const days = Math.round((bday - now) / (1000*60*60*24));
-            return { ...m, dday: (now.getMonth() === m.month-1 && now.getDate() === m.day) ? 0 : days };
-        }).sort((a,b) => a.dday - b.dday);
-
-        container.innerHTML = sorted.map(m => `
-            <div class="bday-row" style="border-left: 3px solid ${m.color}; padding: 8px 12px; background:rgba(255,255,255,0.03); border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:700; font-size:13px;">${m.name}</span>
-                <span style="font-weight:800; color:var(--neon-purple); font-size:12px;">${m.dday === 0 ? "HAPPY B-DAY! 🎉" : "D-" + m.dday}</span>
-            </div>
-        `).join('');
+    function selectMember(btn, heart) {
+        document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedMemberHeart = heart;
     }
 
     async function fetchData() {
         try {
+            // 1. 팁 전용 시트 데이터를 미리 가져옵니다 (배지 표시용)
+            const tr = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/tips!A2:N?key=${API_KEY}`).then(res => res.json());
+            tipsOnly = tr.values || [];
+
+            // 2. 현재 선택된 탭의 데이터를 가져옵니다.
             const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${currentSheet}!A2:N?key=${API_KEY}`).then(res => res.json());
             cachedData = r.values || [];
             renderCards();
@@ -252,91 +170,74 @@
     function renderCards() {
         const q = document.getElementById('search').value.toLowerCase();
         const g = document.getElementById('grid'); g.innerHTML = '';
+        
         const displayData = [...cachedData].reverse();
-        displayData.forEach((row, index) => {
-            const [date, link, cat, appName, title, start, deadline, img] = row;
+        displayData.forEach(row => {
+            const [date, link, memberHeart, appName, title, start, deadline, img] = row;
             if(q && !title.toLowerCase().includes(q)) return;
+
+            // [추가] 팁 탭일 때, 내용이 없는 앱은 숨김 처리
+            if(currentSheet === 'tips' && (!link || !title)) return;
+
             const div = document.createElement('div');
             div.className = 'card';
+            
+            // 멤버별 상징색 하트
+            const hColor = memberHeart === '💙' ? '#3498db' : memberHeart === '💜' ? '#9b59b6' : memberHeart === '💗' ? '#ff7495' : memberHeart === '❤️' ? '#e74c3c' : memberHeart === '🖤' ? '#2d3436' : '#fff';
+            
+            // [추가] 팁 배지 확인 (팁 시트에 해당 앱 이름이 있는지 확인)
+            const hasTip = tipsOnly.some(t => t[3] === appName && t[1]); // 앱 이름이 같고 링크가 있는 경우
+            const tipBadge = (currentSheet === 'data' && hasTip) ? `<div class="tip-badge" onclick="event.stopPropagation(); setCat(null, 'tips')">💡 팁</div>` : "";
+
             div.innerHTML = `
-                ${img ? `<img src="${img}" class="card-img">` : `<div class="card-img" style="background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:20px;">🌟</div>`}
+                <div class="member-heart" style="color:${hColor}">${memberHeart || ''}</div>
+                ${tipBadge}
+                ${img ? `<img src="${img}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=PLLI'">` : `<div class="card-img" style="background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center;">🌟</div>`}
                 <div class="card-title">${title}</div>
-                <button class="go-btn" onclick="window.open('${link}', '_blank')">이동하기</button>
+                <button class="go-btn" onclick="window.open('${link}', '_blank')">${currentSheet === 'tips' ? '팁 보기' : '이동하기'}</button>
             `;
             g.appendChild(div);
         });
     }
 
-    function toggleRegPanel() {
-        const p = document.getElementById('registrationPanel');
-        p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-    }
-
-    function toggleRegFields() {
-        const target = document.getElementById('regTargetSheet').value;
-        document.getElementById('dateInputArea').style.display = target === 'tips' ? 'none' : 'flex';
-        document.getElementById('voteAppArea').style.display = target === 'tips' ? 'none' : 'block';
-    }
-
     async function submitData() {
         const btn = document.getElementById('subBtn');
+        const url = document.getElementById('regLink').value.trim();
+        if(!url) return alert("링크를 넣어주세요!");
+        
+        btn.innerText = "정보 추출 중..."; btn.disabled = true;
         const payload = { 
-            sheetName: document.getElementById('regTargetSheet').value, 
-            url: document.getElementById('regLink').value.trim(), 
+            sheetName: document.getElementById('regTargetSheet').value,
+            url: url, member: selectedMemberHeart,
             userTitle: document.getElementById('regTitle').value.trim(),
             tag: document.getElementById('regVoteApp').value,
-            img: document.getElementById('regImg').value.trim()
+            start: document.getElementById('regStart').value,
+            deadline: document.getElementById('regDeadline').value
         };
-        if(!payload.url || !payload.userTitle) return alert("제목과 링크를 입력해주세요!");
-        btn.innerText = "등록 중..."; btn.disabled = true;
+
         try {
             await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload) });
-            alert("소중한 제보 감사합니다! 곧 반영될 거예요. 💜");
-            toggleRegPanel();
-        } catch (e) { alert("등록 실패. 다시 시도해주세요."); } finally { btn.innerText = "등록하기"; btn.disabled = false; }
+            alert("제보 완료! 💜"); toggleRegPanel(); fetchData();
+        } catch(e) { alert("오류 발생"); } finally { btn.innerText = "등록하기"; btn.disabled = false; }
     }
 
+    function toggleRegPanel() { const p = document.getElementById('registrationPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
+    function toggleRegFields() { document.getElementById('memberArea').style.display = document.getElementById('regTargetSheet').value === 'tips' ? 'none' : 'block'; }
     function setCat(chip, s) { 
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); 
-        chip.classList.add('active'); 
-        currentSheet = s; 
+        if(chip) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); 
+            chip.classList.add('active'); 
+        } else {
+            // 배지 클릭 등으로 강제 이동 시 칩 활성화 처리
+            document.querySelectorAll('.chip').forEach(c => {
+                if(c.innerText.includes('팁')) c.classList.add('active');
+                else c.classList.remove('active');
+            });
+        }
+        currentSheet = s || 'tips'; 
         fetchData(); 
     }
-
-    window.onload = () => { fetchData(); updateBirthdays(); };
-</script>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded, limitToLast, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const chatRef = ref(db, 'chats');
-
-    let myNick = localStorage.getItem('chatNickname') || "익명플리";
-    
-    window.changeNick = function() {
-        const n = prompt("새 닉네임 (최대 8자)");
-        if(n) { localStorage.setItem('chatNickname', n.slice(0,8)); location.reload(); }
-    };
-
-    window.sendChat = function() {
-        const i = document.getElementById('chatInput');
-        if(!i.value.trim()) return;
-        push(chatRef, { nick: myNick, msg: i.value, time: Date.now() });
-        i.value = '';
-    };
-
-    onChildAdded(query(chatRef, limitToLast(30)), (snap) => {
-        const c = snap.val();
-        const box = document.getElementById('chatMessages');
-        const d = document.createElement('div');
-        d.style.marginBottom = "8px";
-        d.innerHTML = `<span style="color:var(--neon-purple); font-weight:bold;">${c.nick}</span>: ${c.msg}`;
-        box.appendChild(d);
-        box.scrollTop = box.scrollHeight;
-    });
+    window.onload = () => { fetchData(); };
 </script>
 </body>
 </html>
